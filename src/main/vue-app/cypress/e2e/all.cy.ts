@@ -1,0 +1,10 @@
+import './t00.cy';
+import './verifyT00.cy';
+import './t01.cy';
+import './verifyT01.cy';
+import './t03.cy';
+import './verifyT03.cy';
+import './t04.cy';
+import './verifyT04.cy';
+import './t05.cy';
+import './verifyT05.cy';

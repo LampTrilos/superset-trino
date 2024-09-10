@@ -1,0 +1,64 @@
+// app global css in SCSS form
+
+h5 {
+  margin: 0px 0px 30px 0px;
+}
+
+.required .q-field__label::after {
+  content: ' *';
+}
+
+.q-table th {
+  font-weight: bold;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a.q-btn:hover {
+  text-decoration: none;
+}
+
+a.q-item:hover {
+  text-decoration: none;
+}
+
+.actions {
+  min-width: 200px;
+  width: 200px;
+}
+
+.side-bar-link {
+  color: inherit;
+  padding: 0px;
+}
+
+.side-bar-link .q-btn__content {
+  justify-content: left;
+}
+
+.side-bar-link .q-focus-helper {
+  display: none;
+}
+
+.side-bar-link .q-ripple {
+  display: none;
+}
+
+.side-bar-link .q-badge--floating {
+  top: -4px;
+  right: -8px;
+}
+
+.light-dimmed-2 {
+  opacity: 0.5;
+}
+
+.text-underline-hover:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,437 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>pol-seal</artifactId>
+  <groupId>gr.police.polseal</groupId>
+  <version>1.0-SNAPSHOT</version>
+
+  <parent>
+    <groupId>eu.ubitech.bitt.core</groupId>
+    <artifactId>core-parent</artifactId>
+    <version>1.4.0</version>
+    <relativePath/>
+  </parent>
+
+  <properties>
+    <assertj.version>3.23.1</assertj.version>
+    <core.stack.version>1.4.0</core.stack.version>
+
+    <failsafe.useModulePath>false</failsafe.useModulePath>
+
+    <coverage.line.limit>0.28</coverage.line.limit>
+    <coverage.branch.limit>0.34</coverage.branch.limit>
+
+    <coverage.line.limit.integration>0.48</coverage.line.limit.integration>
+    <coverage.branch.limit.integration>0.34</coverage.branch.limit.integration>
+
+    <testcontainers.version>1.15.3</testcontainers.version>
+    <testcontainers.keycloak.vesion>2.2.0</testcontainers.keycloak.vesion>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>eu.ubitech.bitt.core</groupId>
+      <artifactId>core-stack</artifactId>
+      <version>${core.stack.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-resteasy-multipart</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-rest-client-jackson</artifactId>
+    </dependency>
+
+    <!-- database dependencies -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-orm-panache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-validator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-jpamodelgen</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-liquibase</artifactId>
+    </dependency>
+
+    <!-- elastic -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-hibernate-search-orm-elasticsearch</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-cache</artifactId>
+    </dependency>
+
+    <!-- mapstruct dependencies -->
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct</artifactId>
+      <version>${mapstruct.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mapstruct</groupId>
+      <artifactId>mapstruct-processor</artifactId>
+      <version>${mapstruct.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- metrics/health dependencies -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-health</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-metrics</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-fault-tolerance</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-opentracing</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-jdbc</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-openapi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-jwt</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-config-yaml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-arc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- PDF Dependencies -->
+<!--    <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-resteasy-reactive-qute</artifactId>
+    </dependency>-->
+    <!-- ZXing dependencies for QR code generation -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>3.5.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>3.5.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-core</artifactId>
+        <version>1.0.10</version>
+    </dependency>
+    <dependency>
+        <groupId>com.openhtmltopdf</groupId>
+        <artifactId>openhtmltopdf-pdfbox</artifactId>
+        <version>1.0.10</version>
+    </dependency>
+    <dependency>
+        <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+        <artifactId>owasp-java-html-sanitizer</artifactId>
+        <version>20220608.1</version>
+    </dependency>
+    <dependency>
+        <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+        <artifactId>dss-pades-pdfbox</artifactId>
+        <version>5.12</version>
+    </dependency>
+    <dependency>
+        <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+        <artifactId>dss-token</artifactId>
+        <version>5.12</version>
+    </dependency>
+    <dependency>
+        <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+        <artifactId>dss-utils-apache-commons</artifactId>
+        <version>5.12</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.opencsv/opencsv -->
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>5.8</version>
+    </dependency>
+
+    <!--soap-->
+    <dependency>
+      <groupId>io.quarkiverse.cxf</groupId>
+      <artifactId>quarkus-cxf</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkiverse.cxf</groupId>
+      <artifactId>quarkus-cxf-rt-features-logging</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+
+    <!-- scheduler -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-scheduler</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.11.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>5.2.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi-ooxml</artifactId>
+      <version>5.2.2</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-panache-mock</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit5</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+      <version>${assertj.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-test-security</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.dasniko</groupId>
+      <artifactId>testcontainers-keycloak</artifactId>
+      <version>${testcontainers.keycloak.vesion}</version>
+      <scope>test</scope>
+    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.testcontainers</groupId>-->
+<!--      <artifactId>elasticsearch</artifactId>-->
+<!--      <version>${testcontainers.version}</version>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
+    <!-- To enable Kafka -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+    </dependency>
+
+    <!-- HMAC and hashing -->
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.15</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>build</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+<!--      <plugin>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-codegen-plugin</artifactId>
+        <version>3.5.2</version>
+        <executions>
+          <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceRoot>src/main/java/generated-sources/cxf</sourceRoot>
+              <wsdlOptions>
+                <wsdlOption>
+                  <wsdl>src/main/resources/wsdl/VehicleFacade.wsdl</wsdl>
+                </wsdlOption>
+              </wsdlOptions>
+            </configuration>
+            <goals>
+              <goal>wsdl2java</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>-->
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>native</id>
+      <activation>
+        <property>
+          <name>native</name>
+        </property>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <quarkus.package.type>native</quarkus.package.type>
+        <quarkus.native.report-errors-at-runtime>true</quarkus.native.report-errors-at-runtime>
+      </properties>
+    </profile>
+    <profile>
+      <id>vue</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <version>1.10.2</version>
+            <executions>
+              <execution>
+                <id>install node and npm</id>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>v16.16.0</nodeVersion>
+                  <npmVersion>8.11.0</npmVersion>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm run build</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run prod</arguments>
+                </configuration>
+              </execution>
+            </executions>
+            <configuration>
+              <workingDirectory>src/main/vue-app</workingDirectory>
+              <installDirectory>target</installDirectory>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- For development with H2 Database -->
+    <profile>
+      <id>dev</id>
+      <dependencies>
+        <!-- testing dependencies -->
+        <dependency>
+          <groupId>io.quarkus</groupId>
+          <artifactId>quarkus-jdbc-h2</artifactId>
+          <!--      <scope>test</scope>-->
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
+  <repositories>
+    <!-- Explicitly define Maven central (first), so that CI job tries to fetch from it first. -->
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+
+<!--    <repository>-->
+<!--      <id>gitlab-maven</id>-->
+<!--      <url>https://gitlab.ubitech.eu/api/v4/groups/bitt/-/packages/maven</url>-->
+<!--    </repository>-->
+  </repositories>
+
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>gitlab-maven</id>
+      <url>https://gitlab.ubitech.eu/api/v4/groups/bitt/-/packages/maven</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>
