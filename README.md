@@ -14,7 +14,7 @@
 
 Trino: `http://localhost:8080/ui/` (username can be anything) <br>
 Minio: `http://localhost:9001/` (username: `minio_access_key`, password: `minio_secret_key`)<br>
-Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br>
+Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br> 
 
 ## Connect to Trino in Superset:
 1. Go to `data` dropdown and click `databases`
