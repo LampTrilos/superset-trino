@@ -1,8 +1,8 @@
-version: "3.9"
+version: '3.3'
 services:
   hive:
     build: ./hive
-    entrypoint: /init-hive.sh
+    entrypoint: ./bin/bash ./init-hive.sh
     ports:
       - "9083:9083"
       - "10000:10000"
@@ -13,7 +13,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 0.5
+          cpus: 1.0
           memory: 500M
   postgres:
     image: postgres:latest
@@ -29,7 +29,7 @@ services:
           cpus: 0.5
           memory: 500M
   minio:
-    image: minio/minio:latest
+    image: minio/minio:RELEASE.2024-09-09T16-59-28Z
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -42,11 +42,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 1
+          cpus: 1.0
           memory: 1G
 
   trino-coordinator:
-    image: "trinodb/trino:latest"
+    image: "trinodb/trino:457"
     ports:
       - '8080:8080'
     volumes:
@@ -57,11 +57,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: 2
+          cpus: 1.0
           memory: 3G
 
   trino-worker:
-    image: "trinodb/trino:latest"
+    image: "trinodb/trino:457"
     volumes:
       - ./trino/worker/etc:/etc/trino:ro
     depends_on:
@@ -71,7 +71,7 @@ services:
       replicas: 2
       resources:
         limits:
-          cpus: 2
+          cpus: 1.0
           memory: 6G
 
   superset:
@@ -80,10 +80,12 @@ services:
       - "8088:8088"
     volumes:
       - superset-data:/app/superset_home
+    environment:
+      - SUPERSET_SECRET_KEY=24865129682968Aa!
     deploy:
       resources:
         limits:
-          cpus: 1
+          cpus: 1.0
           memory: 1G
 volumes:
   minio-data:

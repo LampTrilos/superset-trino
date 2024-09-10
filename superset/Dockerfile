@@ -1,4 +1,4 @@
-FROM apache/superset:latest
+FROM apache/superset:4.0.2
 # Switching to root to install the required packages
 USER root
 # Example: installing the MySQL driver to connect to the metadata database

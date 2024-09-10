@@ -52,7 +52,7 @@ RUN curl -L \
 # Configure
 ADD files/hive-site.xml $HIVE_CONF_DIR/
 
-ADD files/init-hive.sh /
+COPY files/init-hive.sh /init-hive.sh
 RUN chmod +x /init-hive.sh
 
 EXPOSE 9083
