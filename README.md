@@ -10,11 +10,13 @@
 2. Install docker + docker-compose
 3. Run `docker-compose --compatibility up`
 4. Run `bash bootstrap-superset.sh`
-4. Done! Checkout the service endpoints:
+5. Done! Checkout the service endpoints:
+
 
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
 Minio: `http://localhost:9001/` (username: `minio`, password: `minio123`)<br>
 Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br>
+
 
 ## Connect to Trino in Superset:
 1. Go to `data` dropdown and click `databases`
