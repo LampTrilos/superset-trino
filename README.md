@@ -125,3 +125,6 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
+
+Maven Goal to start the Backend:
+-Dmaven.test.skip clean compile quarkus:dev

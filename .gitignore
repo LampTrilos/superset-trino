@@ -1,5 +1,7 @@
 .venv
 .idea
+./target
+./src/main/vue-app/node_modules
 
 ./ais_mapped.csv
 ais_mapped.csv
