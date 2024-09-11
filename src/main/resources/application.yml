@@ -1,0 +1,148 @@
+quarkus:
+  package:
+    type: uber-jar
+  http:
+    test-port: 8083
+    test-ssl-port: 8446
+    root-path:
+  swagger-ui:
+    path: /swagger-ui
+    always-include: true
+    theme: muted
+  transaction-manager:
+    default-transaction-timeout: 180
+
+
+  datasource:
+    username:
+    password:
+    db-kind: h2
+    jdbc:
+      url: jdbc:h2:tcp://localhost/mem:test
+      tracing: true
+
+
+  hibernate-orm:
+    jdbc:
+      timezone: 'UTC'
+  #    sql-load-script: import.sql
+
+  #  hibernate-search-orm:
+  #    elasticsearch:
+  #      version: 8
+  #      protocol: http
+  #      analysis:
+  #        configurer: bean:customAnalysisConfigurer
+  #      schema-management:
+  #        required-status: yellow
+  #    schema-management:
+  #      strategy: drop_and_create
+  #    automatic-indexing:
+  #      synchronization:
+  #        strategy: sync
+
+  ssl:
+    native: false
+
+  oidc:
+    auth-server-url:
+    client-id:
+    credentials:
+      secret:
+
+  jaeger:
+    service-name:
+    sampler-type: const
+    sampler-param: 1
+    endpoint:
+    metrics:
+      enabled: true
+
+  log:
+    console:
+      enable: true
+      format: '%d{HH:mm:ss} %-5p traceId=%X{traceId}, spanId=%X{spanId}, sampled=%X{sampled} [%c{2.}] (%t) %s%e%n'
+
+  liquibase:
+    migrate-at-start: false
+    change-log: db/changeLog.xml
+
+  jackson:
+    timezone: 'UTC'
+
+  locales: en-US, el-GR
+
+
+  #Without this it will start its own dev instance of Kafka/or w/e container is needed
+  devservices:
+    enabled: false
+
+keycloak:
+  baseurl:
+  realm:
+  admin:
+    username:
+    password:
+    email: admin@ubitech.eu
+  required-actions:
+    - VERIFY_EMAIL
+    - UPDATE_PASSWORD
+
+app:
+  data:
+    keycloak-only: true
+    users:
+      - username: username
+        firstname: first
+        lastname: last
+        email: aUser@ubitech.eu
+        roles: user
+        realm: quarkus
+
+"%dev":
+  quarkus:
+    datasource:
+      metrics:
+        enabled: true
+      username:
+      password:
+      db-kind: h2
+      jdbc:
+        #This demands a container or service to be running
+        #url: jdbc:h2:tcp://localhost/mem:test
+        url: jdbc:h2:mem:polseal;DB_CLOSE_DELAY=-1
+    hibernate-orm:
+      #dialect: org.hibernate.dialect.PostgreSQLDialect
+      dialect: org.hibernate.dialect.H2Dialect
+      jdbc:
+        timezone: 'UTC'
+      database:
+        generation: create
+      log:
+        sql: true
+      liquibase:
+        migrate-at-start: false
+        change-log: db/changeLog.xml
+    devservices:
+      enabled: false
+    mailer:
+      mock: true
+  domain:
+
+"%test":
+  quarkus:
+    devservices:
+      enabled: false
+    datasource:
+      jdbc:
+        tracing: false
+    hibernate-orm:
+      #dialect: org.hibernate.dialect.PostgreSQLDialect
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      log:
+        sql: true
+    hibernate-search-orm:
+      elasticsearch:
+        version: 7
+    mailer:
+      mock: true
