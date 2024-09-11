@@ -37,7 +37,7 @@ The dataset which will be used for demo purposes, is the `ais_mapped` which resi
 Smaller file: trino/Sample.csv
 
 1. Upload the CSV to a **ais** inside the `raw-data` bucket in MinIO. We use the directory /ais for this examle.
-
+ 
 2. Create an external temporary table pointing to that directory.
 ```sql
 CREATE TABLE hive.hive_schema.ais_temp (
@@ -151,7 +151,7 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 1. Go to `data` dropdown and click `databases`
 2. Click the `+ database` button
 3. For `Select a database to connect` choose `presto`
-4. In `SQLALCHEMY URI` put `trino://hive@trino-coordinator:8080/hive`
+4. In `SQLALCHEMY URI` put `trino://hive@trino-coordinator:5542/hive`
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
