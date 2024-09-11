@@ -1,4 +1,4 @@
-.env
+./.env
 .idea
 /src/main/vue-app/node_modules/
 

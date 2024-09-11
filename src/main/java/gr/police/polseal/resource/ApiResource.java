@@ -36,7 +36,6 @@ public class ApiResource {
 
     private final NotificationResource notificationResource;
 
-    private final PDFResource pdfResource;
 
     private final OuResource ouResource;
 
@@ -50,7 +49,6 @@ public class ApiResource {
 
     private final ChallengeChannelResource challengeChannelResource;
 
-    private final SignRequestResource signRequestResource;
 
 //  private final SoapResource soapResource;
 //
@@ -59,9 +57,6 @@ public class ApiResource {
 //  private final SoapVehicleResource soapVehicleResource;
 //
 //  private final ExcelResource excelResource;
-
-    @ConfigProperty(name = "diaxirisi.prosopikou.api.key")
-    String diaxirisProsopikouApiKey;
 
 //  private final BalanceService balanceService;
 //
@@ -155,10 +150,7 @@ public class ApiResource {
     }
 
     //TODO: Think about Authentication
-    @Path("/signRequest")
-    public SignRequestResource signRequestResource() {
-        return signRequestResource;
-    }
+
 
 
 //  @Path("soap")
@@ -194,10 +186,7 @@ public class ApiResource {
 //    return Response.ok(enumService.getItemCodeTemplates()).build();
 //  }
 
-    @Path("/pdf")
-    public PDFResource pdfResource() {
-        return pdfResource;
-    }
+
 
     @Path("/ous")
     public OuResource ouResource() {
