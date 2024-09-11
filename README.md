@@ -34,9 +34,10 @@ Create a DB Connection (Trino) as `jdbc:trino://localhost:5542` - user "admin", 
 ## Importing Data
 
 The dataset which will be used for demo purposes, is the `ais_mapped` which resides in this folder. It is a CSV with AIS data.
+Smaller file: trino/Sample.csv
 
 1. Upload the CSV to a **ais** inside the `raw-data` bucket in MinIO. We use the directory /ais for this examle.
-
+ 
 2. Create an external temporary table pointing to that directory.
 ```sql
 CREATE TABLE hive.hive_schema.ais_temp (
@@ -60,6 +61,19 @@ WITH (
     csv_separator=',', 
     external_location='s3a://raw-data/ais/', 
     skip_header_line_count=1);
+
+#####  Smaller file:
+
+CREATE TABLE hive.hive_schema.ais_temp (
+Name         VARCHAR,
+Age          VARCHAR
+)
+    WITH (
+        format = 'CSV',
+        csv_separator=',',
+        external_location='s3a://raw-data/ais/',
+        skip_header_line_count=1);
+
 ```
 
 3. Check if table was successfully imported with a simple query.
@@ -88,6 +102,15 @@ CREATE TABLE hive.hive_schema.ais (
 WITH (
     format = 'ORC'
 );
+
+#### Smaller file:
+CREATE TABLE hive.hive_schema.ais (
+Name         VARCHAR,
+Age          INTEGER
+)
+    WITH (
+        format = 'ORC'
+        );
 ```
 
 6. Import data to Hive-managed table.
@@ -109,6 +132,13 @@ SELECT
        try_cast(length AS INTEGER),
        try_cast(width AS INTEGER)
 FROM hive.hive_schema.ais_temp;
+
+##### Smaller File:
+INSERT INTO hive.hive_schema.ais
+SELECT
+    Name,
+    try_cast(Age AS INTEGER)
+FROM hive.hive_schema.ais_temp;
 ```
 
 7. Check if import was successful.
@@ -121,7 +151,7 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 1. Go to `data` dropdown and click `databases`
 2. Click the `+ database` button
 3. For `Select a database to connect` choose `presto`
-4. In `SQLALCHEMY URI` put `trino://hive@trino-coordinator:8080/hive`
+4. In `SQLALCHEMY URI` put `trino://hive@trino-coordinator:5542/hive`
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
