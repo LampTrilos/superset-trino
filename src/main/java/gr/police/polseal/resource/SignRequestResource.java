@@ -1,7 +1,6 @@
 package gr.police.polseal.resource;
 
 import gr.police.polseal.dto.SignRequestDto;
-import gr.police.polseal.service.KafkaProducerService;
 import gr.police.polseal.service.SignRequestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +31,6 @@ import javax.ws.rs.core.Response;
 public class SignRequestResource {
 
 
-    @Inject
-    KafkaProducerService kafkaProducerService;
 
     @Inject
     SignRequestService signRequestService;
