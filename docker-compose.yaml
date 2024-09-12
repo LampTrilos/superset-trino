@@ -127,6 +127,8 @@ services:
       - superset-data:/app/superset_home
     environment:
       - SUPERSET_SECRET_KEY=24865129682968Aa!
+      - SUPERSET_HOME=/app/superset_home
+      - SUPERSET_CONFIG_PATH=/app/superset_config.py
     deploy:
       resources:
         limits:
