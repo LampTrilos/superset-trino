@@ -2,6 +2,9 @@
   "clientId": "superset",
   "name": "superset",
   "description": "",
+  "rootUrl": "",
+  "adminUrl": "",
+  "baseUrl": "",
   "surrogateAuthRequired": false,
   "enabled": true,
   "alwaysDisplayInConsole": false,
@@ -26,32 +29,29 @@
   "protocol": "openid-connect",
   "attributes": {
     "oidc.ciba.grant.enabled": "false",
-    "oauth2.device.authorization.grant.enabled": "false",
     "client.secret.creation.time": "1726131252",
     "backchannel.logout.session.required": "true",
-    "backchannel.logout.revoke.offline.tokens": "false",
-    "request.uris": "",
-    "post.logout.redirect.uris": "http://localhost:8090/login",
-    "consent.screen.text": "",
-    "frontchannel.logout.url": "",
-    "backchannel.logout.url": "",
     "login_theme": "keycloak",
-    "display.on.consent.screen": false
+    "post.logout.redirect.uris": "http://localhost:8090/login",
+    "oauth2.device.authorization.grant.enabled": "false",
+    "display.on.consent.screen": "false",
+    "backchannel.logout.revoke.offline.tokens": "false"
   },
   "authenticationFlowBindingOverrides": {},
   "fullScopeAllowed": true,
   "nodeReRegistrationTimeout": -1,
   "protocolMappers": [
     {
-      "name": "Client Host",
+      "name": "Client IP Address",
       "protocol": "openid-connect",
       "protocolMapper": "oidc-usersessionmodel-note-mapper",
       "consentRequired": false,
       "config": {
-        "user.session.note": "clientHost",
+        "user.session.note": "clientAddress",
+        "userinfo.token.claim": "true",
         "id.token.claim": "true",
         "access.token.claim": "true",
-        "claim.name": "clientHost",
+        "claim.name": "clientAddress",
         "jsonType.label": "String"
       }
     },
@@ -62,6 +62,7 @@
       "consentRequired": false,
       "config": {
         "user.session.note": "clientId",
+        "userinfo.token.claim": "true",
         "id.token.claim": "true",
         "access.token.claim": "true",
         "claim.name": "clientId",
@@ -69,15 +70,16 @@
       }
     },
     {
-      "name": "Client IP Address",
+      "name": "Client Host",
       "protocol": "openid-connect",
       "protocolMapper": "oidc-usersessionmodel-note-mapper",
       "consentRequired": false,
       "config": {
-        "user.session.note": "clientAddress",
+        "user.session.note": "clientHost",
+        "userinfo.token.claim": "true",
         "id.token.claim": "true",
         "access.token.claim": "true",
-        "claim.name": "clientAddress",
+        "claim.name": "clientHost",
         "jsonType.label": "String"
       }
     }
@@ -105,8 +107,5 @@
     "view": true,
     "configure": true,
     "manage": true
-  },
-  "rootUrl": "",
-  "baseUrl": "",
-  "adminUrl": ""
+  }
 }
