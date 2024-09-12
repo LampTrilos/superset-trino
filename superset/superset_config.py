@@ -4,7 +4,7 @@ SECRET_KEY='TBLKfWlPWmnck079U09c9mOeoZnoAEdF'
 
 # Enable OAuth authentication
 AUTH_TYPE = AUTH_OAUTH
-LOGOUT_REDIRECT_URL='http://keycloak:8090/realms/quarkus/protocol/openid-connect/logout'
+LOGOUT_REDIRECT_URL='http://host.docker.internal:8090/realms/quarkus/protocol/openid-connect/logout'
 AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = 'Gamma'
 # OAuth provider configuration for Keycloak
@@ -19,8 +19,8 @@ OAUTH_PROVIDERS = [
             'client_kwargs': {
                 'scope': 'openid profile ivuser email roles',
             },
-            'server_metadata_url': 'http://keycloak:8090/realms/quarkus/.well-known/openid-configuration',
-            'api_base_url': 'http://keycloak:8090/realms/quarkus/protocol/',
+            'server_metadata_url': 'http://host.docker.internal:8090/realms/quarkus/.well-known/openid-configuration',
+            'api_base_url': 'http://host.docker.internal:8090/realms/quarkus/account/',
         },
     }
     ]

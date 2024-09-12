@@ -11,10 +11,10 @@
   "clientAuthenticatorType": "client-secret",
   "secret": "TBLKfWlPWmnck079U09c9mOeoZnoAEdF",
   "redirectUris": [
-    "http://localhost:8090/oauth-authorized/keycloak"
+    "http://localhost:8088/oauth-authorized/keycloak"
   ],
   "webOrigins": [
-    "http://localhost:8090/*"
+    "http://localhost:8088/*"
   ],
   "notBefore": 0,
   "bearerOnly": false,
@@ -32,29 +32,19 @@
     "client.secret.creation.time": "1726131252",
     "backchannel.logout.session.required": "true",
     "login_theme": "keycloak",
-    "post.logout.redirect.uris": "http://localhost:8090/login",
+    "post.logout.redirect.uris": "http://localhost:8088/login",
     "oauth2.device.authorization.grant.enabled": "false",
     "display.on.consent.screen": "false",
-    "backchannel.logout.revoke.offline.tokens": "false"
+    "backchannel.logout.revoke.offline.tokens": "false",
+    "request.uris": "",
+    "consent.screen.text": "",
+    "frontchannel.logout.url": "",
+    "backchannel.logout.url": ""
   },
   "authenticationFlowBindingOverrides": {},
   "fullScopeAllowed": true,
   "nodeReRegistrationTimeout": -1,
   "protocolMappers": [
-    {
-      "name": "Client IP Address",
-      "protocol": "openid-connect",
-      "protocolMapper": "oidc-usersessionmodel-note-mapper",
-      "consentRequired": false,
-      "config": {
-        "user.session.note": "clientAddress",
-        "userinfo.token.claim": "true",
-        "id.token.claim": "true",
-        "access.token.claim": "true",
-        "claim.name": "clientAddress",
-        "jsonType.label": "String"
-      }
-    },
     {
       "name": "Client ID",
       "protocol": "openid-connect",
@@ -66,6 +56,20 @@
         "id.token.claim": "true",
         "access.token.claim": "true",
         "claim.name": "clientId",
+        "jsonType.label": "String"
+      }
+    },
+    {
+      "name": "Client IP Address",
+      "protocol": "openid-connect",
+      "protocolMapper": "oidc-usersessionmodel-note-mapper",
+      "consentRequired": false,
+      "config": {
+        "user.session.note": "clientAddress",
+        "userinfo.token.claim": "true",
+        "id.token.claim": "true",
+        "access.token.claim": "true",
+        "claim.name": "clientAddress",
         "jsonType.label": "String"
       }
     },
