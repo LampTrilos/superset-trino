@@ -12,6 +12,7 @@
 4. Run `bash bootstrap-superset.sh`
 5. Done! Checkout the service endpoints:
 6. Manually insert the superset client in Keycloak with superset.json
+7. Manually insert users, and also remove the user action "Update Password" from the first user tab
 
 
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
