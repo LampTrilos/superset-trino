@@ -18,7 +18,7 @@ OAUTH_PROVIDERS = [
             'client_id': 'superset',
             'client_secret': 'TBLKfWlPWmnck079U09c9mOeoZnoAEdF',
             'client_kwargs': {
-                'scope': 'openid profile email',
+                'scope': 'openid profile email ouid',
             },
             'server_metadata_url': 'http://host.docker.internal:8090/realms/quarkus/.well-known/openid-configuration',
             'api_base_url': 'http://host.docker.internal:8090/realms/quarkus/protocol/',

@@ -9,7 +9,7 @@
 1. Clone repo
 2. Install docker + docker-compose
 3. Run `docker-compose up -d`
-4. Run `bash bootstrap-superset.sh`
+### Not needed anymore, it was built in the Dockerfile and docler-compose 4. Run `bash bootstrap-superset.sh`
 5. Done! Checkout the service endpoints:
 6. Manually insert the superset client in Keycloak with superset.json
 7. Manually insert users, and also remove the user action "Update Password" from the first user tab
