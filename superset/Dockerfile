@@ -5,5 +5,9 @@ USER root
 # if you prefer Postgres, you may want to use `psycopg2-binary` instead
 RUN pip install mysqlclient
 RUN pip install sqlalchemy-trino
+#This is needed for Keycloak interoperability
+RUN pip install Flask-OAuthlib Authlib
 # Switching back to using the `superset` user
 USER superset
+
+COPY /superset_config.py /app/superset_config.py
