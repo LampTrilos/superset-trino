@@ -11,7 +11,7 @@ class CustomSsoSecurityManager(SupersetSecurityManager):
         me.raise_for_status()
         data = me.json()
         logging.info("User info from Keycloak: %s", data)
-        logging.info(data.get("realm_access", {}).get("roles", []))
+        #logging.info(data.get("realm_access", {}).get("roles", []))
         return {
             "username": data.get("preferred_username", ""),
             "first_name": data.get("given_name", ""),
