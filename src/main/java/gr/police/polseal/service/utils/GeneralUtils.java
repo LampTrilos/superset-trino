@@ -4,6 +4,9 @@ import gr.police.polseal.exception.BadRequestAlertException;
 import org.eclipse.microprofile.opentracing.Traced;
 
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -85,6 +88,23 @@ public class GeneralUtils {
       System.out.println("Invalid input format");
       return null;
     }
+  }
+
+  public static String[] extractingCSVHeaders(String fileName){
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName+".csv"))) {
+      // Read the first line which is the header
+      String headerLine = br.readLine().replace("\"","");
+
+      if (headerLine != null) {
+        // Split the header by commas
+        String[] header = headerLine.split(",");
+        return header;
+      }
+
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
 }

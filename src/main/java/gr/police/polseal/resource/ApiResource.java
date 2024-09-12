@@ -49,6 +49,8 @@ public class ApiResource {
 
     private final ChallengeChannelResource challengeChannelResource;
 
+    private final TransformLoadDataResource transformLoadDataResource;
+
 
 //  private final SoapResource soapResource;
 //
@@ -149,7 +151,14 @@ public class ApiResource {
         return challengeChannelResource;
     }
 
-    //TODO: Think about Authentication
+   //todo na bgei to sxolio sto authenticated
+//    @Authenticated
+    @Path("/tl")
+    public TransformLoadDataResource transformLoadDataResource() {
+        return transformLoadDataResource;
+    }
+
+
 
 
 
