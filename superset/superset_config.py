@@ -4,7 +4,8 @@ SECRET_KEY='TBLKfWlPWmnck079U09c9mOeoZnoAEdF'
 
 # Enable OAuth authentication
 AUTH_TYPE = AUTH_OAUTH
-LOGOUT_REDIRECT_URL='http://host.docker.internal:8090/realms/quarkus/protocol/openid-connect/logout'
+#LOGOUT_REDIRECT_URL='http://host.docker.internal:8090/realms/quarkus/protocol/openid-connect/logout'
+LOGOUT_REDIRECT_URL='http://localhost:8088/login/'
 AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = 'Gamma'
 # OAuth provider configuration for Keycloak
