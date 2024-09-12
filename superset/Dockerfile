@@ -11,3 +11,4 @@ RUN pip install Flask-OAuthlib Authlib
 USER superset
 
 COPY /superset_config.py /app/superset_config.py
+COPY /bootstrap-superset.sh /app/bootstrap-superset.sh
