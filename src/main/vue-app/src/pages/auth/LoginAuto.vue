@@ -2,7 +2,7 @@
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <q-page class="flex flex-center bg-grey-2">
-        <div v-if="!error">Σύνδεση...</div>
+        <div v-if="error">Σύνδεση...</div>
         <q-card v-else class="q-pa-md shadow-2 my_card" bordered>
           <q-card-section class="text-center">
             <div class="text-grey-9 text-h5 text-weight-bold">Log in</div>
@@ -61,23 +61,24 @@ sessionStorage.clear();
 accountStore.$reset();
 
 let error = ref(false);
-axios
-  .post(
-    '/api/v1/auth/autologin' +
-      (route.query.depunitid ? '/' + route.query.depunitid : '')
-  )
-  .then((res) => {
-    console.log('Auto Login success');
-    util.methods.setLocalStorage(res.data);
-    router.push({
-      name: 'ManageApplications',
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-    console.log('Error auto login');
-    error.value = true;
-  });
+//We don't want the  autologin to fire, only the manual login is allowed
+// axios
+//   .post(
+//     '/api/v1/auth/autologin' +
+//       (route.query.depunitid ? '/' + route.query.depunitid : '')
+//   )
+//   .then((res) => {
+//     console.log('Auto Login success');
+//     util.methods.setLocalStorage(res.data);
+//     router.push({
+//       name: 'ManageApplications',
+//     });
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//     console.log('Error auto login');
+//     error.value = true;
+//   });
 
 //manual login
 let loginRequest = reactive({ username: null, password: null });
