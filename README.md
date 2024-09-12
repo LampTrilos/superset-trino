@@ -11,6 +11,7 @@
 3. Run `docker-compose up -d`
 4. Run `bash bootstrap-superset.sh`
 5. Done! Checkout the service endpoints:
+6. Manually insert the superset client in Keycloak with superset.json
 
 
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
