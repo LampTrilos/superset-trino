@@ -15,11 +15,11 @@
 7. Manually insert users, and also remove the user action "Update Password" from the first user tab
 To add the roles inside the token go: Clients -> backend-service -> Client Details -> Dedicated Scopes -> Add Mapper -> User Client Roles/roles/backend-service/roles for Token Claim Name
 ###Keycloak Client roles are mapped to Superset roles like this:####
-     "admin": ["Admin"],
-     "superUser": ["Alpha"],
-     "simpleUser": ["Gamma"]"
-     "logistics":
-     "sales"
+   "admin": ["Admin"],
+   "superUser": ["Alpha"],
+   "simpleUser": ["Gamma"],
+   "sales": ["sales"],
+   "logistics": ["logistics"],
 
 ####UIs are accessible at the following links:#####
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
@@ -164,6 +164,7 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
+6. As Admin, create the roles needed, and grant them rights on the "Datasource.Table" that you have already created datasets from 
 
 Maven Goal to start the Backend:
 -Dmaven.test.skip clean compile quarkus:dev
