@@ -13,10 +13,13 @@
 5. Done! Checkout the service endpoints:
 6. Manually insert the superset client in Keycloak with superset.json
 7. Manually insert users, and also remove the user action "Update Password" from the first user tab
-###Keycloak roles are mapped to Superset roles like this:####
+To add the roles inside the token go: Clients -> backend-service -> Client Details -> Dedicated Scopes -> Add Mapper -> User Client Roles/roles/backend-service/roles for Token Claim Name
+###Keycloak Client roles are mapped to Superset roles like this:####
      "admin": ["Admin"],
      "superUser": ["Alpha"],
-     "simpleUser": ["Gamma"]
+     "simpleUser": ["Gamma"]"
+     "logistics":
+     "sales"
 
 ####UIs are accessible at the following links:#####
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
@@ -164,3 +167,41 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 
 Maven Goal to start the Backend:
 -Dmaven.test.skip clean compile quarkus:dev
+
+
+
+
+#################If an exported realm cannot be inserted in Keycloak###################
+
+For me only changing the js policy to regex policy for Keycloak 24.0.4 worked and is cleaner for this Default Policy IMO.
+{
+"id": "b56eebd7-8e73-4449-b110-30dfdbc77f03",
+"name": "Default Policy",
+"description": "A policy that grants access only for users within this realm",
+"type": "js",
+"logic": "POSITIVE",
+"decisionStrategy": "AFFIRMATIVE",
+"config": {
+"code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
+}
+},
+
+for:
+
+{
+"id": "b56eebd7-8e73-4449-b110-30dfdbc77f03",
+"name": "Default Policy",
+"description": "A policy that grants access only for users within this realm",
+"type": "regex",
+"logic": "POSITIVE",
+"decisionStrategy": "AFFIRMATIVE",
+"config": {
+"targetContextAttributes" : "false",
+"pattern" : ".*",
+"targetClaim" : "sub"
+}
+}
+
+Also, all secrets are converted to ***** so search for "secret":
+
+

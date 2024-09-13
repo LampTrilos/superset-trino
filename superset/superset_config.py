@@ -42,8 +42,8 @@ OAUTH_PROVIDERS = [
         'icon': 'fa-key',
         'token_key': 'access_token',  # Keycloak uses 'access_token' for the access token
         'remote_app': {
-            'client_id': 'superset',
-            'client_secret': 'TBLKfWlPWmnck079U09c9mOeoZnoAEdF',
+            'client_id': 'backend-service',
+            'client_secret': 'secret',
             'client_kwargs': {
                 'scope': 'openid email profile',
                 #'scope': 'openid profile email  roles',
