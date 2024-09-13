@@ -1,5 +1,5 @@
 <template>
-  <TableManagedApplications :title="t('Allowed_Applications')">
+  <TableManagedApplications :title="t('Allowed_Applications')" >
 
   </TableManagedApplications>
 </template>
