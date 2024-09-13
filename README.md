@@ -13,8 +13,12 @@
 5. Done! Checkout the service endpoints:
 6. Manually insert the superset client in Keycloak with superset.json
 7. Manually insert users, and also remove the user action "Update Password" from the first user tab
+###Keycloak roles are mapped to Superset roles like this:####
+     "admin": ["Admin"],
+     "superUser": ["Alpha"],
+     "simpleUser": ["Gamma"]
 
-
+####UIs are accessible at the following links:#####
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
 Minio: `http://localhost:9001/` (username: `minio`, password: `minio123`)<br>
 Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br>

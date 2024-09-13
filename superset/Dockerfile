@@ -10,6 +10,6 @@ RUN pip install Flask-OAuthlib Authlib
 # Switching back to using the `superset` user
 USER superset
 
-COPY /superset_config.py /app/superset_config.py
-COPY /bootstrap-superset.sh /app/bootstrap-superset.sh
-COPY /CustomSsoSecurityManager.py /app/CustomSsoSecurityManager.py
+COPY --chown=superset:superset /superset_config.py /app/superset_config.py
+COPY --chown=superset:superset /bootstrap-superset.sh /app/bootstrap-superset.sh
+COPY --chown=superset:superset /CustomSsoSecurityManager.py /app/CustomSsoSecurityManager.py
