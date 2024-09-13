@@ -51,9 +51,10 @@ public class AuthenticationResource {
   @POST
   @Path("/login")
   public Response login(@Valid UsernamePasswordRequest usernamePasswordRequest) {
-    bearerTokenAuthorizationService.login(usernamePasswordRequest);
-    User user = userRepository.find("id", Long.valueOf(usernamePasswordRequest.getUsername())).firstResultOptional().orElseThrow(() -> new NotFoundAlertException(User.class.getName()));
-    AuthToken token = authorizationService.autologin(user.getArithmosMitroou(), null);
+    AuthToken token = bearerTokenAuthorizationService.login(usernamePasswordRequest);
+    //For the purposes of this demo, we must not create new users via autologin, so we just pre-register the users in Keycloak and then do a simple login
+    //User user = userRepository.find("id", Long.valueOf(usernamePasswordRequest.getUsername())).firstResultOptional().orElseThrow(() -> new NotFoundAlertException(User.class.getName()));
+    //AuthToken token = authorizationService.autologin(user.getArithmosMitroou(), null);
     if (token == null) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
