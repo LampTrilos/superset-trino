@@ -5,7 +5,7 @@ import gr.police.polseal.dto.SignUpRequest;
 import gr.police.polseal.dto.UserDto;
 import gr.police.polseal.dto.UserRoleDto;
 import gr.police.polseal.model.User;
-import gr.police.polseal.model.permissions.UserRole;
+//import gr.police.polseal.model.permissions.UserRole;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 
@@ -22,9 +22,9 @@ public interface UserMapper {
 
   List<UserDto> toUserDto(List<User> users);
 
-  UserRoleDto toUserRoleDto(UserRole userRole);
+  //UserRoleDto toUserRoleDto(UserRole userRole);
 
-  List<UserRoleDto> toUserRoleDto(List<UserRole> userRoles);
+  //List<UserRoleDto> toUserRoleDto(List<UserRole> userRoles);
 
   KeycloakUser toKeycloakUser(User user);
 

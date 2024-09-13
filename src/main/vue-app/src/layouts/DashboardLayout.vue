@@ -138,10 +138,10 @@ getMyPermissions();
 const leftSideBarLinks = computed(() => {
   return [
     {
-      title: t('Allowed_Applications'),
-      icon: 'checklist_rtl',
+      title: t('File Upload'),
+      icon: 'cloud_upload',
       link: {
-        name: 'ManageApplications',
+        name: 'Dashboard',
       },
       visible: true,
     },
@@ -154,10 +154,10 @@ const leftSideBarLinks = computed(() => {
     //   visible: true,
     // },
     {
-      title: t('history_update'),
-      icon: 'sym_o_rss_feed',
+      title: t('Superset'),
+      icon: 'bar_chart',
       link: {
-        name: 'HistoryUpdate',
+        name: 'Superset',
       },
       visible: true,
     },

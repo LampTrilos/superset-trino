@@ -39,7 +39,7 @@ public class NotificationService {
 
   private final EntityManager em;
 
-  private final UserService userService;
+  //private final UserService userService;
 
   private final UserRepository userRepository;
 

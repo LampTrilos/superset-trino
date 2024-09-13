@@ -100,7 +100,7 @@ public class TransactionService {
 
   private final UserRepository userRepository;
 
-  private final PermissionService permissionService;
+  //private final PermissionService permissionService;
 
 //  private final DepartmentService departmentService;
 
@@ -108,7 +108,7 @@ public class TransactionService {
 
 //  private final VathmosService vathmosService;
 
-  private final UserRoleRepository userRoleRepository;
+  //private final UserRoleRepository userRoleRepository;
 
 //  private final AssetPliroforikiRepository assetPliroforikiRepository;
 //
@@ -138,7 +138,7 @@ public class TransactionService {
 //
 //  private final SyndesiKinitouRepository syndesiKinitouRepository;
 
-  private final UserService userService;
+  //private final UserService userService;
 
 //  private final OchimaTransactionRepository ochimaTransactionRepository;
 //

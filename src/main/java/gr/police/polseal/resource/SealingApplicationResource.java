@@ -11,7 +11,7 @@ import gr.police.polseal.model.permissions.PermissionAction;
 import gr.police.polseal.model.permissions.PermissionEntity;
 import gr.police.polseal.repository.SealingApplicationRepository;
 import gr.police.polseal.service.JwtService;
-import gr.police.polseal.service.PermissionService;
+//import gr.police.polseal.service.PermissionService;
 import gr.police.polseal.service.SealingApplicationService;
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.UnauthorizedException;
@@ -45,7 +45,7 @@ public class SealingApplicationResource {
     private final SealingApplicationMapper sealingApplicationMapper;
 
     private final JwtService jwtService;
-    private final PermissionService permissionService;
+    //private final PermissionService permissionService;
 
 
     //Fetches the active or inactive Sealing Applications

@@ -9,10 +9,19 @@
 1. Clone repo
 2. Install docker + docker-compose
 3. Run `docker-compose up -d`
-4. Run `bash bootstrap-superset.sh`
+### Not needed anymore, it was built in the Dockerfile and docler-compose 4. Run `bash bootstrap-superset.sh`
 5. Done! Checkout the service endpoints:
+6. Manually insert the superset client in Keycloak with superset.json
+7. Manually insert users, and also remove the user action "Update Password" from the first user tab
+To add the roles inside the token go: Clients -> backend-service -> Client Details -> Dedicated Scopes -> Add Mapper -> User Client Roles/roles/backend-service/roles for Token Claim Name
+###Keycloak Client roles are mapped to Superset roles like this:####
+   "admin": ["Admin"],
+   "superUser": ["Alpha"],
+   "simpleUser": ["Gamma"],
+   "sales": ["sales"],
+   "logistics": ["logistics"],
 
-
+####UIs are accessible at the following links:#####
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
 Minio: `http://localhost:9001/` (username: `minio`, password: `minio123`)<br>
 Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br>
@@ -155,6 +164,45 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
+6. As Admin, create the roles needed, and grant them rights on the "Datasource.Table" that you have already created datasets from 
 
 Maven Goal to start the Backend:
 -Dmaven.test.skip clean compile quarkus:dev
+
+
+
+
+#################If an exported realm cannot be inserted in Keycloak###################
+
+For me only changing the js policy to regex policy for Keycloak 24.0.4 worked and is cleaner for this Default Policy IMO.
+{
+"id": "b56eebd7-8e73-4449-b110-30dfdbc77f03",
+"name": "Default Policy",
+"description": "A policy that grants access only for users within this realm",
+"type": "js",
+"logic": "POSITIVE",
+"decisionStrategy": "AFFIRMATIVE",
+"config": {
+"code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
+}
+},
+
+for:
+
+{
+"id": "b56eebd7-8e73-4449-b110-30dfdbc77f03",
+"name": "Default Policy",
+"description": "A policy that grants access only for users within this realm",
+"type": "regex",
+"logic": "POSITIVE",
+"decisionStrategy": "AFFIRMATIVE",
+"config": {
+"targetContextAttributes" : "false",
+"pattern" : ".*",
+"targetClaim" : "sub"
+}
+}
+
+Also, all secrets are converted to ***** so search for "secret":
+
+

@@ -1,70 +1,70 @@
--- Insert Sample Data
-INSERT INTO userp (id, username, firstName, lastName, email, phone, apolitiIerarchia, arithmosMitroou, idApospasis,
-                   idOrganikis, idParousias, idVathmou, imerominiaGennisis, katigoriaProsopikoy, mitroo, patronymo)
-VALUES (275330, '275330', 'Testosios', 'Testaras', 'test@astynomia.gr', '123-456-7890', 1, '275330', 1001, 2001, 3001, 4001,
-        '1990-06-25', 'Category A', 275330, 'Athanasios');
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (21,'176SIGNALS2','Σηματικές', 1);
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (22,'191VAS2','Β.Α.Σ', 0);
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (23,'176BOOK','Βιβλίο Υπηρεσίας', 1);
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (24,'191BOBA','ΒΟΒΑ', 1);
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (25,'176CARPC','CAR PC', 0);
-
-INSERT into sealingApplication(id,appcode,description, active)
-values (26,'191ERP','ERP', 0);
-
-
-INSERT into challengeChannel(id,Description)
-values (1,'SMS');
-
-INSERT into challengeChannel(id,Description)
-values (2,'Authenticator');
-INSERT into challengeChannel(id,Description)
-values (3,'E-mail');
-
-insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
-values ( 25,2 );
-insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
-values ( 25,1 );
-insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
-values ( 22,3 );
-
-
-insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
-values ( 21, 'vas-122', 'Αντίγραφο ΒΑΣ',25,5,1, 'asdasdsd' );
-
-insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
-values ( 22, 'vas-1','Βεβαίωση Διοικητή',22,4,1, 'asdasdsd' );
-
-insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
-values ( 23,'signals-12', 'Σηματική Τροχαίου',23,5,1, 'asdasdsd' );
-
-insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
-values ( 24, 'signals-13', 'Σηματική Εγκλήματος',25,3,0, 'asdasdsd' );
-
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 21, 21, 0, '22' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 22, 21, 1, '00' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 23, 21, 2, '01' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 24, 21, 3, '02' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 27, 23, 0, '22' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 28, 24, 0, '22' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 29, 24, 1, '00' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 30, 24, 2, '02' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 31, 24, 3, '10' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 32, 22, 0, '22' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 33, 22, 1, '00' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 34, 22, 2, '00' );
-INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 35, 22, 3, '10' );
-
-
--- insert into sign_requests(id,userId,email,phoneNumber,creationTimestamp,timestampOfRequest, timestampOfSignature, templateCode, challengeChannelId, rowId, verificationCode, signatureText)
--- values ( 541546,275330, 'asdfasf@asdf.com', '',1725802452513,null,null, 'vas-122', 1, '11223344', '111111', null );
+-- -- Insert Sample Data
+-- INSERT INTO userp (id, username, firstName, lastName, email, phone, apolitiIerarchia, arithmosMitroou, idApospasis,
+--                    idOrganikis, idParousias, idVathmou, imerominiaGennisis, katigoriaProsopikoy, mitroo, patronymo)
+-- VALUES (275330, '275330', 'Testosios', 'Testaras', 'test@astynomia.gr', '123-456-7890', 1, '275330', 1001, 2001, 3001, 4001,
+--         '1990-06-25', 'Category A', 275330, 'Athanasios');
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (21,'176SIGNALS2','Σηματικές', 1);
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (22,'191VAS2','Β.Α.Σ', 0);
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (23,'176BOOK','Βιβλίο Υπηρεσίας', 1);
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (24,'191BOBA','ΒΟΒΑ', 1);
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (25,'176CARPC','CAR PC', 0);
+--
+-- INSERT into sealingApplication(id,appcode,description, active)
+-- values (26,'191ERP','ERP', 0);
+--
+--
+-- INSERT into challengeChannel(id,Description)
+-- values (1,'SMS');
+--
+-- INSERT into challengeChannel(id,Description)
+-- values (2,'Authenticator');
+-- INSERT into challengeChannel(id,Description)
+-- values (3,'E-mail');
+--
+-- insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
+-- values ( 25,2 );
+-- insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
+-- values ( 25,1 );
+-- insert into SealingApplicationChannel(SealingApplicationId,ChallengeChanellId)
+-- values ( 22,3 );
+--
+--
+-- insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
+-- values ( 21, 'vas-122', 'Αντίγραφο ΒΑΣ',25,5,1, 'asdasdsd' );
+--
+-- insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
+-- values ( 22, 'vas-1','Βεβαίωση Διοικητή',22,4,1, 'asdasdsd' );
+--
+-- insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
+-- values ( 23,'signals-12', 'Σηματική Τροχαίου',23,5,1, 'asdasdsd' );
+--
+-- insert into sealingTemplate(id,code,description,sealingApplicationId,maxSignatures,sealOnEveryPage, emailMessage)
+-- values ( 24, 'signals-13', 'Σηματική Εγκλήματος',25,3,0, 'asdasdsd' );
+--
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 21, 21, 0, '22' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 22, 21, 1, '00' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 23, 21, 2, '01' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 24, 21, 3, '02' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 27, 23, 0, '22' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 28, 24, 0, '22' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 29, 24, 1, '00' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 30, 24, 2, '02' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 31, 24, 3, '10' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 32, 22, 0, '22' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 33, 22, 1, '00' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 34, 22, 2, '00' );
+-- INSERT INTO signatureMetadata(id,SealingTemplateId, index, position) values ( 35, 22, 3, '10' );
+--
+--
+-- -- insert into sign_requests(id,userId,email,phoneNumber,creationTimestamp,timestampOfRequest, timestampOfSignature, templateCode, challengeChannelId, rowId, verificationCode, signatureText)
+-- -- values ( 541546,275330, 'asdfasf@asdf.com', '',1725802452513,null,null, 'vas-122', 1, '11223344', '111111', null );

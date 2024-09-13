@@ -4,7 +4,7 @@ import eu.ubitech.bitt.core.domain.storage.service.StorageService;
 import gr.police.polseal.dto.SealingTemplateDto;
 import gr.police.polseal.repository.SealingApplicationRepository;
 import gr.police.polseal.service.JwtService;
-import gr.police.polseal.service.PermissionService;
+//import gr.police.polseal.service.PermissionService;
 import gr.police.polseal.service.SealingTemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ public class SealingTemplateResource {
     private final SealingTemplateService sealingTemplateService;
 
     private final JwtService jwtService;
-    private final PermissionService permissionService;
+    //private final PermissionService permissionService;
 
     private static final String TEMPLATE_BUCKET = "template-";
 

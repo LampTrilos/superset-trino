@@ -4,7 +4,7 @@ import gr.police.polseal.dto.options.ToOptions;
 import gr.police.polseal.dto.page.Page;
 import gr.police.polseal.exception.NotFoundAlertException;
 import gr.police.polseal.model.Vathmos;
-import gr.police.polseal.model.Vathmos_;
+//import gr.police.polseal.model.Vathmos_;
 import gr.police.polseal.restclients.VathmosDtoClient;
 import gr.police.polseal.service.utils.ServiceUtils;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class VathmosService {
     // Order
     List<Order> orders = serviceUtils.getSort(cb, root, options.sort);
     // Default ordering
-    orders.add(cb.asc(root.get(Vathmos_.id)));
+    //orders.add(cb.asc(root.get(Vathmos_.id)));
     // End Order
     lcq.select(root).where(predicate).orderBy(orders);
     Query query = em.createQuery(lcq);

@@ -1,21 +1,21 @@
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-  /*  {
-    path: '/',
-    component: () => import('layouts/LandingLayout.vue'),
-    children: [
-      {
-        name: 'Home',
-        path: '/',
-        component: () => import('pages/landing/HomePage.vue'),
-        meta: {
-          title: 'Home',
-          requiresAuth: false,
-        },
-      },
-    ],
-  },*/
+  //   {
+  //   path: '/',
+  //   component: () => import('layouts/LandingLayout.vue'),
+  //   children: [
+  //     {
+  //       name: 'Home',
+  //       path: '/',
+  //       component: () => import('pages/landing/HomePage.vue'),
+  //       meta: {
+  //         title: 'Home',
+  //         requiresAuth: false,
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/app',
     component: () => import('layouts/DashboardLayout.vue'),
@@ -83,6 +83,24 @@ const routes: RouteRecordRaw[] = [
     //example localhost:8081/otp?userId=275330&templateCode=vas-122&rowId=11223344&callbackUrl=https://www.google.com/search?q=rowId
     path: '/otp',
     component: () => import('pages/Transactions/Otp-dialog.vue'),
+  },
+  {
+    name: 'Superset',
+    //path: '/otp/:userId/:templateCode/:rowId',
+    //example localhost:8081/otp?userId=275330&templateCode=vas-122&rowId=11223344&callbackUrl=https://www.google.com/search?q=rowId
+    path: '/otp',
+    beforeEnter(to, from, next) {
+      //const {userId, templateCode, rowId, callbackUrl} = to.query;
+
+      // Construct the external URL with parameters
+      const externalUrl = 'http://localhost:8088';
+
+      // Open the external URL in a new tab
+      window.open(externalUrl, '_blank');
+
+      // Optionally redirect to another route or prevent further navigation
+      //next(false); // This prevents the current route from being navigated
+    }
   },
   // Always leave this as last one,
   // but you can also remove it
