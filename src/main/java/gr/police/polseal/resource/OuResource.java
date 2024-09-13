@@ -10,7 +10,7 @@ import gr.police.polseal.restclients.HumanResourceClient;
 import gr.police.polseal.restclients.OuDtoClient;
 import gr.police.polseal.service.JwtService;
 import gr.police.polseal.service.OuService;
-import gr.police.polseal.service.PermissionService;
+//import gr.police.polseal.service.PermissionService;
 import io.quarkus.security.Authenticated;
 import io.quarkus.security.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class OuResource {
 
   private final OuService ouService;
 
-  private final PermissionService permissionService;
+  //private final PermissionService permissionService;
 
   private final JwtService jwtService;
 
@@ -70,23 +70,23 @@ public class OuResource {
     return Response.ok(ouService.getOu(id)).build();
   }
 
-  @GET
-  @Path("/sync-ous")
-  @Authenticated
-  public Response syncOus() {
-    if (!permissionService.checkIfUserHasPermission(PermissionResDto.builder().entity(PermissionEntity.OUS)
-        .action(PermissionAction.ADD).build())) {
-      throw new UnauthorizedException();
-    }
-    List<OuDtoClient> list = humanResourceClient.getYpiresia();
-    for (OuDtoClient dto : list) {
-      ouService.persistOrUpdateOuHistFromRest(dto);
-    }
-    for (OuDtoClient dto : list) {
-      ouService.persistOrUpdateOuFromRest(dto);
-    }
-    return Response.noContent().build();
-  }
+//  @GET
+//  @Path("/sync-ous")
+//  @Authenticated
+//  public Response syncOus() {
+//    if (!permissionService.checkIfUserHasPermission(PermissionResDto.builder().entity(PermissionEntity.OUS)
+//        .action(PermissionAction.ADD).build())) {
+//      throw new UnauthorizedException();
+//    }
+//    List<OuDtoClient> list = humanResourceClient.getYpiresia();
+//    for (OuDtoClient dto : list) {
+//      ouService.persistOrUpdateOuHistFromRest(dto);
+//    }
+//    for (OuDtoClient dto : list) {
+//      ouService.persistOrUpdateOuFromRest(dto);
+//    }
+//    return Response.noContent().build();
+//  }
 
 }
 

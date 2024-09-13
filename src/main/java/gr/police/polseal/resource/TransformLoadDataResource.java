@@ -41,6 +41,8 @@ public class TransformLoadDataResource {
     @POST
     @Path("load-file-to-bucket")
     public Response loadFile(String csvAsBase64, @QueryParam("fileId") String fileId) throws Exception {
+        // Remove leading and trailing quotes
+        csvAsBase64 = csvAsBase64.replaceAll("^\"+|\"+$", "");
 
 //        todo na mpei to tenantId apo to token
 //        String tenantId = String.valueOf(jwtService.getUserId());

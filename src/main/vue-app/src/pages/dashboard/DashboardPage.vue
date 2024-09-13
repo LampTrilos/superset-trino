@@ -126,14 +126,19 @@ function onSubmit() {
   // When the file is fully read, this function will be called
   reader.onload = () => {
     // `reader.result` contains the file data as a base64 string prefixed by the data type (e.g., "data:text/csv;base64,...")
-    const base64File = reader.result.split(',')[1]; // Split off the "data:text/csv;base64," part and keep the base64 data only
-
-    const data = {
-      file: base64File // Prepare the data for sending
-    };
+    let base64File = reader.result.split(',')[1]; // Split off the "data:text/csv;base64," part and keep the base64 data only
+    // const data = {
+    //   file: base64File // Prepare the data for sending
+    // };
+    // console.log(typeof base64File);
+    // console.log(base64File)
 
     // Send the base64-encoded file to the server
-    axios.post('/api/v1/tl/transform-then-load', data)
+    axios.post('/api/v1/tl/load-file-to-bucket?fileId=' + file.value.name, base64File, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
       .then(response => {
         console.log('File uploaded successfully', response);
       })

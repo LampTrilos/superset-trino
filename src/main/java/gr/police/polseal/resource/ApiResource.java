@@ -18,7 +18,7 @@ public class ApiResource {
 
     private final AuthenticationResource authenticationResource;
 
-    private final UserResource userResource;
+    //private final UserResource userResource;
 
 //  private final ItemCodeResource itemCodeResource;
 //
@@ -30,7 +30,7 @@ public class ApiResource {
 
 //  private final ItemResource itemResource;
 
-    private final PermissionResource permissionResource;
+    //private final PermissionResource permissionResource;
 
 //  private final EnumService enumService;
 
@@ -73,11 +73,11 @@ public class ApiResource {
         return authenticationResource;
     }
 
-    @Authenticated
-    @Path("/users")
-    public UserResource userResource() {
-        return userResource;
-    }
+//    @Authenticated
+//    @Path("/users")
+//    public UserResource userResource() {
+//        return userResource;
+//    }
 
 //  @Authenticated
 //  @Path("/codes")
@@ -115,11 +115,11 @@ public class ApiResource {
 //    return itemMetaptosiResource;
 //  }
 
-    @Authenticated
-    @Path("/permissions")
-    public PermissionResource permissionResource() {
-        return permissionResource;
-    }
+//    @Authenticated
+//    @Path("/permissions")
+//    public PermissionResource permissionResource() {
+//        return permissionResource;
+//    }
 
     @Authenticated
     @Path("/notifications")

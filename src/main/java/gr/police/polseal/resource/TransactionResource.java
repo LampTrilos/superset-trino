@@ -50,7 +50,7 @@ public class TransactionResource {
 
   //private final DepartmentService departmentService;
 
-  private final PermissionService permissionService;
+  //private final PermissionService permissionService;
   
   private final JwtService jwtService;
 

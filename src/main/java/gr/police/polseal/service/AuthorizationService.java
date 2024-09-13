@@ -36,7 +36,7 @@ public class AuthorizationService {
 
   private final UserRepository userRepository;
 
-  private final PermissionService permissionService;
+  //private final PermissionService permissionService;
 
   @Traced
   public AuthToken autologin(String arithmosMitroou, String depUnitId) {
