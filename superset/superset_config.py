@@ -59,7 +59,9 @@ OAUTH_PROVIDERS = [
 AUTH_ROLES_MAPPING = {
   "admin": ["Admin"],
   "superUser": ["Alpha"],
-  "simpleUser": ["Gamma"]
+  "simpleUser": ["Gamma"],
+  "sales": ["sales"],
+  "logistics": ["logistics"]
 }
 
 
