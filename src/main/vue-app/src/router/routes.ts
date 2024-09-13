@@ -1,21 +1,21 @@
 import { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-  /*  {
-    path: '/',
-    component: () => import('layouts/LandingLayout.vue'),
-    children: [
-      {
-        name: 'Home',
-        path: '/',
-        component: () => import('pages/landing/HomePage.vue'),
-        meta: {
-          title: 'Home',
-          requiresAuth: false,
-        },
-      },
-    ],
-  },*/
+  //   {
+  //   path: '/',
+  //   component: () => import('layouts/LandingLayout.vue'),
+  //   children: [
+  //     {
+  //       name: 'Home',
+  //       path: '/',
+  //       component: () => import('pages/landing/HomePage.vue'),
+  //       meta: {
+  //         title: 'Home',
+  //         requiresAuth: false,
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: '/app',
     component: () => import('layouts/DashboardLayout.vue'),
