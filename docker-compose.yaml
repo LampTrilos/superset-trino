@@ -126,7 +126,7 @@ services:
     volumes:
       - superset-data:/app/superset_home
     #To create the db and default admin user and not interrupt the server
-    command: ["/bin/bash", "-c", "/app/bootstrap-superset.sh && /usr/bin/run-server.sh"]
+    command: ["/bin/bash", "-c", " pwd && ls -l && ./bootstrap-superset.sh && /usr/bin/run-server.sh"]
     environment:
       - SUPERSET_SECRET_KEY=24865129682968Aa!
       - SUPERSET_HOME=/app/superset_home
