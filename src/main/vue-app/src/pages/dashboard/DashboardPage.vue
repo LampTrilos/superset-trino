@@ -1,5 +1,5 @@
 <template>
-  <h5>{{ t('notification', 2) }}</h5>
+  <h5>{{ t('File upload', 2) }}</h5>
   <div v-if="announcement?.message" class="row q-my-md q-col-gutter-sm">
     <q-banner rounded class="bg-primary text-white">
       <template v-slot:avatar>
@@ -10,6 +10,7 @@
   </div>
   <div class="row q-my-md q-col-gutter-sm">
     <div class="col-6 col-md-3">
+      sdfsdafsadfsf
       <q-select
         filled
         :label="t('status')"
