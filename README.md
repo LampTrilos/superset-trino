@@ -14,6 +14,7 @@
 6. Manually insert the superset client in Keycloak with superset.json
 7. Manually insert users, and also remove the user action "Update Password" from the first user tab
 To add the roles inside the token go: Clients -> backend-service -> Client Details -> Dedicated Scopes -> Add Mapper -> User Client Roles/roles/backend-service/roles for Token Claim Name
+8. Superset auto-imports the roles&permission file roles_export.json, since it is built in the image
 ###Keycloak Client roles are mapped to Superset roles like this:####
    "admin": ["Admin"],
    "superUser": ["Alpha"],
@@ -164,7 +165,10 @@ SELECT * FROM hive.hive_schema.ais LIMIT 20;
 5. Switch over to `Advanced` tab
 5. In `SQL Lab` select all options
 5. In `Security` select `Allow data upload`
-6. As Admin, create the roles needed, and grant them rights on the "Datasource.Table" that you have already created datasets from 
+6. As Admin, create the roles needed, and grant them rights on the "Datasource.Table" that you have already created datasets from
+7. If you need to export roles and permissions run:
+   docker exec -it trino-hive-superset-superset-1 flask fab export-roles -path /app/roles_export.json
+   docker cp trino-hive-superset-superset-1:roles_export.json .
 
 Maven Goal to start the Backend:
 -Dmaven.test.skip clean compile quarkus:dev

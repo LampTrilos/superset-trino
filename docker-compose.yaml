@@ -125,8 +125,9 @@ services:
       - "8088:8088"
     volumes:
       - superset-data:/app/superset_home
-    #To create the db and default admin user and not interrupt the server
-    command: ["/bin/bash", "-c", " pwd && ls -l && ./bootstrap-superset.sh && /usr/bin/run-server.sh"]
+    #To create the db and default admin user, import the previously exported permissions and not interrupt the server
+    #Check the Readme for instruction on how to export Roles & Permissions
+    command: ["/bin/bash", "-c", " pwd && ls -l && ./bootstrap-superset.sh && superset fab import-roles -p ./roles_export.json && /usr/bin/run-server.sh"]
     environment:
       - SUPERSET_SECRET_KEY=24865129682968Aa!
       - SUPERSET_HOME=/app/superset_home
