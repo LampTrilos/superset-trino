@@ -77,12 +77,16 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+      #- "9002:9002"  # HTTPS port
     volumes:
       - minio-data:/data
+      #- ./certs:/etc/minio  # Mount the folder containing certificate.pem and key.pem
     environment:
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
-    command: server /data --console-address ":9001"
+      #MINIO_ROOT_USER: minio
+      #MINIO_ROOT_PASSWORD: minio123
+    command: server /data --console-address ":9001" #/certs --certs-dir
     deploy:
       resources:
         limits:

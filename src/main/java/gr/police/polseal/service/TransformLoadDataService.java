@@ -3,25 +3,14 @@ package gr.police.polseal.service;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
 import com.opencsv.CSVReader;
-import eu.europa.esig.dss.model.DSSDocument;
-import eu.europa.esig.dss.model.InMemoryDocument;
 import eu.ubitech.bitt.core.domain.storage.service.StorageService;
-import gr.police.polseal.dto.SignRequestDto;
-import gr.police.polseal.model.SealingTemplate;
 import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.UploadObjectArgs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,26 +20,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.enterprise.context.ApplicationScoped;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -71,6 +49,9 @@ public class TransformLoadDataService {
     @ConfigProperty(name = "minio.endpoint")
     private String minioendpoint;
 
+    @ConfigProperty(name = "minio.endpoint.https")
+    private String minioendpointHttps;
+
     @ConfigProperty(name = "minio_accesskey")
     private String minioaccesskey;
 
@@ -87,6 +68,42 @@ public class TransformLoadDataService {
                 tempName, "csv");
 
     }
+//
+    public int createNewMinioUser(String newUser, String newSecret) throws IOException {
+        // Admin credentials for MinIO
+        String adminAccessKey = minioaccesskey;
+        String adminSecretKey = miniosecretkey;
+
+        // MinIO endpoint
+        String minioEndpoint = minioendpointHttps;
+
+        // Create the JSON request body
+        String jsonInputString = "{\"accessKey\":\"" + newUser + "\", \"secretKey\":\"" + newSecret + "\"}";
+
+        // URL for the MinIO Admin API endpoint to create users
+        URL url = new URL(minioEndpoint + "/minio/admin/v3/add-user");
+
+        // Set up HTTP connection
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        // Set authorization header (admin credentials)
+        String auth = adminAccessKey + ":" + adminSecretKey;
+        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+        connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
+
+        // Send the request
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonInputString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        // Check the response code
+       return connection.getResponseCode();
+
+    }
 
 
     public void putObjectOnBucket(String tenantiId, String bucketname, String objectname, String mimetype)
@@ -97,6 +114,13 @@ public class TransformLoadDataService {
                 .endpoint(minioendpoint)
                 .credentials(minioaccesskey, miniosecretkey)
                 .build();
+
+////        creation of the minio client
+//        MinioClient minioClient = MinioClient.builder()
+//                .endpoint(minioendpoint)
+//                .credentials("testUser", "test123")
+//                .build();
+
 
         boolean foundRawData = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketname).build());
         if (!foundRawData) {
@@ -110,18 +134,18 @@ public class TransformLoadDataService {
                 .build());
 
 //        if it doesn't exist, we create the hive-warehouse
-        boolean foundHiveWareHouse = minioClient.bucketExists(BucketExistsArgs.builder().bucket("hive-warehouse").build());
+        boolean foundHiveWareHouse = minioClient.bucketExists(BucketExistsArgs.builder().bucket("hive-warehouse-"+tenantiId).build());
         if (!foundHiveWareHouse) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket("hive-warehouse").build());
-            System.out.println("Bucket \"hive-warehouse\" created ");
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket("hive-warehouse"+tenantiId).build());
+            System.out.println("Bucket hive-warehouse-"+tenantiId +" created ");
         } else {
-            System.out.println("Bucket hive-warehouse already exists.");
+            System.out.println("Bucket hive-warehouse-"+tenantiId+" already exists.");
         }
     }
 
     public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema.temp_" + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_"+tenantId+".temp_" + tenantId + "\n" +
                 "(\n");
         for (int i = 0; i < csvHeaders.length - 2; i++) {
             sql.append(csvHeaders[i]).append(" VARCHAR,\n");
@@ -133,7 +157,7 @@ public class TransformLoadDataService {
                 "    external_location = 's3a://raw-data/" + tenantId + "',\n" +
                 "    skip_header_line_count = 1)");
 
-        String result = trinoProcessing(sql.toString());
+        String result = trinoProcessing(sql.toString(), tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {
@@ -144,7 +168,7 @@ public class TransformLoadDataService {
 
     public boolean createOrcHiveTable(String tenantId, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema." + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_"+tenantId+"."+ tenantId + "\n" +
                 "(\n");
 //        we iterate until length - 2 because we don't need the comma (,) at the length - 1
         for (int i = 0; i < csvHeaders.length - 2; i++) {
@@ -155,7 +179,7 @@ public class TransformLoadDataService {
                 "      format = 'ORC')"
         );
 
-        String result = trinoProcessing(sql.toString());
+        String result = trinoProcessing(sql.toString(), tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {
@@ -167,7 +191,7 @@ public class TransformLoadDataService {
 
     public boolean insertIntoOrcTable(String tenantId, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("INSERT INTO  hive.hive_schema." + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("INSERT INTO  hive.hive_schema_"+tenantId+"." + tenantId + "\n" +
                 " SELECT ");
         for (int i = 0; i < csvHeaders.length - 2; i++) {
 //            if the headerType is VARCHAR, then there is no need to try_cast
@@ -186,7 +210,7 @@ public class TransformLoadDataService {
         sql.append(" FROM hive.hive_schema.temp_" + tenantId);
 
 
-        String result = trinoProcessing(sql.toString());
+        String result = trinoProcessing(sql.toString(), tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {
@@ -316,7 +340,7 @@ public class TransformLoadDataService {
     }
 
 
-    public String trinoProcessing(String sql) {
+    public String trinoProcessing(String sql, String tenantId) {
         JsonElement dataTable = null;
         String queryEndpoint = trinoUri + "/v1/statement";
         final HttpClient client = new DefaultHttpClient();
@@ -325,7 +349,7 @@ public class TransformLoadDataService {
         post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
         post.setHeader("content-type", "application/json");
         post.setHeader("X-Trino-Catalog", "hive");
-        post.setHeader("X-Trino-Schema", "hive_schema");
+        post.setHeader("X-Trino-Schema", "hive_schema_"+tenantId);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 
 
@@ -376,9 +400,9 @@ public class TransformLoadDataService {
         return newResponseString;
     }
 
-    public boolean createHiveSchema() {
-        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema WITH (location = 's3a://hive-warehouse/')";
-        String result = trinoProcessing(sql);
+    public boolean createHiveSchema(String tenantId) {
+        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_"+tenantId+" WITH (location = 's3a://hive-warehouse/')";
+        String result = trinoProcessing(sql,tenantId );
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {

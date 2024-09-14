@@ -15,10 +15,9 @@ import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.Base64;
 
 
@@ -38,13 +37,26 @@ public class TransformLoadDataResource {
 
     private final JwtService jwtService;
 
+
+    @POST
+    @Path("create-new-minio-user")
+    public Response createMinioUser(@QueryParam("username") String username, @QueryParam("password") String password) throws IOException {
+        int responseCode = transformLoadDataService.createNewMinioUser(username, password);
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            return Response.status(Response.Status.OK).entity("User created successfully").build();
+        } else {
+            return Response.status(Response.Status.OK).entity("Failed to create user. Response code:" + responseCode).build();
+        }
+    }
+
+
     @POST
     @Path("load-file-to-bucket")
-    public Response loadFile(String csvAsBase64, @QueryParam("fileId") String fileId) throws Exception {
+    public Response loadFile(String csvAsBase64, @QueryParam("fileId") String fileId, @QueryParam("organisation") String tenantId) throws Exception {
 
 //        todo na mpei to tenantId apo to token
 //        String tenantId = String.valueOf(jwtService.getUserId());
-        String tenantId = "sam";
+
 
         // Decode the Base64 string to byte array
         byte[] decodedBytes = Base64.getDecoder().decode(csvAsBase64);
@@ -64,7 +76,7 @@ public class TransformLoadDataResource {
 
         if (csvHeaders != null && csvHeaders.length > 0) {
 
-            boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema();
+            boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(tenantId );
             boolean successfulTempTableCreation = false;
             boolean successfulOrcTableCreation = false;
             boolean successfulInsertion = false;
