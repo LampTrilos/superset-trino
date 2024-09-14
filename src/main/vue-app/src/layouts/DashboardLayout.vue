@@ -128,7 +128,7 @@ const elasBackground = computed(() => {
 
 
 // permissions
-getMyPermissions();
+// getMyPermissions();
 
 //Dont know what this is for
 // const myLeftSideBarLinks = computed(() => {

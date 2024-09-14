@@ -99,6 +99,7 @@ import {reactive, ref} from 'vue';
 import ButtonSearch from 'components/buttons/ButtonSearch.vue';
 import ButtonSearchReset from 'components/buttons/ButtonSearchReset.vue';
 import axios from "axios";
+import {Notify} from "quasar";
 
 const {formatDateTimeLocale} = useDateFormatter();
 
@@ -116,8 +117,11 @@ const file = ref(null);
 function onSubmit() {
   //console.log(file)
   if (!file.value) {
-    console.error('No file selected');
-    window.alert('No file selected')
+    //console.error('No file selected');
+    Notify.create({
+      message: t('Please select a file'),
+      color: 'amber-9'
+    });
     return;
   }
 
@@ -140,10 +144,18 @@ function onSubmit() {
       }
     })
       .then(response => {
-        console.log('File uploaded successfully', response);
+        Notify.create({
+          message: t('File successfully uploaded'),
+          color: 'green'
+        });
+        //console.log('File uploaded successfully', response);
       })
       .catch(error => {
-        console.error('Error uploading file', error);
+        Notify.create({
+          message: t('Error while uploading file'),
+          color: 'red'
+        });
+        //console.error('Error uploading file', error);
       });
   };
 
