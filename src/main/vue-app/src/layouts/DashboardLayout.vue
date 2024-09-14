@@ -271,21 +271,21 @@ provide("logout", logout)
 const { breadcrumbs } = storeToRefs(useBreadcrumbsStore());
 
 // departments
-const { data: departments } = useQuery({
-  queryKey: ['getMyDepartments'],
-  queryFn: () => getMyDepartments(),
-});
-
-function changeDepartment(val: any) {
-  console.log('Change department id: ' + val);
-  enabledNotifications.value = false;
-  loggingOut.value = true;
-  router.push({
-    name: 'AutoLogin',
-    query: { depunitid: val },
-  });
-}
-provide("changeDepartment", changeDepartment)
+// const { data: departments } = useQuery({
+//   queryKey: ['getMyDepartments'],
+//   queryFn: () => getMyDepartments(),
+// });
+//
+// function changeDepartment(val: any) {
+//   console.log('Change department id: ' + val);
+//   enabledNotifications.value = false;
+//   loggingOut.value = true;
+//   router.push({
+//     name: 'AutoLogin',
+//     query: { depunitid: val },
+//   });
+// }
+// provide("changeDepartment", changeDepartment)
 
 //timer
 let dashboardUnmounted = false;
@@ -349,13 +349,13 @@ onBeforeUnmount(() => {
   dashboardUnmounted = true;
 });
 
-let roles = ref('');
-axios
-  .get('/api/v1/users/my-roles')
-  .then((res) => {
-      roles.value = res.data;
-  })
-  .catch((error) => {
-      console.log(error);
-  })
+// let roles = ref('');
+// axios
+//   .get('/api/v1/users/my-roles')
+//   .then((res) => {
+//       roles.value = res.data;
+//   })
+//   .catch((error) => {
+//       console.log(error);
+//   })
 </script>
