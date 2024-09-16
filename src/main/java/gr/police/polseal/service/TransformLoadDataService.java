@@ -129,8 +129,8 @@ public class TransformLoadDataService {
         }
         minioClient.uploadObject(UploadObjectArgs.builder()
                 .bucket(bucketname)
-                .object(tenantiId + "/" + objectname + "." + mimetype)
-                .filename(objectname + "." + mimetype)
+                .object(tenantiId + "/" + objectname)
+                .filename(objectname)
                 .build());
 
 //        if it doesn't exist, we create the hive-warehouse
@@ -224,7 +224,7 @@ public class TransformLoadDataService {
         int rowsToCheck = 5;  // Number of rows to check for each column
 
 
-        try (CSVReader reader = new CSVReader(new FileReader(filename + ".csv"))) {
+        try (CSVReader reader = new CSVReader(new FileReader(filename))) {
             String[] headers = reader.readNext();  // Read headers
             String[] headerType = new String[headers.length];
 

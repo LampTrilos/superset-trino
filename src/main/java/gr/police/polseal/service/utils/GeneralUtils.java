@@ -91,7 +91,7 @@ public class GeneralUtils {
   }
 
   public static String[] extractingCSVHeaders(String fileName){
-    try (BufferedReader br = new BufferedReader(new FileReader(fileName+".csv"))) {
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
       // Read the first line which is the header
       String headerLine = br.readLine().replace("\"","");
 

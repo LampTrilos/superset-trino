@@ -17,6 +17,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Base64;
 
 
@@ -64,16 +65,23 @@ public class TransformLoadDataResource {
             byte[] decodedBytes = Base64.getDecoder().decode(csvAsBase64);
             // Create a temporary CSV file
             String tempName = tenantId + "_" + fileId;
-            File csvFile = new File(tempName + ".csv");
+            if (!fileId.contains(".csv")){
+                tempName += ".csv";
+            }
+            File csvFile = new File(tempName);
             FileUtils.writeByteArrayToFile(csvFile, decodedBytes);
 
             //loading the csv file into the raw-data bucket of min io
             transformLoadDataService.loadFileTOBucket(tempName, tenantId);
 
+//           we delete the in memory created file
+            Files.deleteIfExists(java.nio.file.Path.of(tempName));
+
 //        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
 //        in order to use them to our create and insert trino queries
             String[] csvHeaders = GeneralUtils.extractingCSVHeaders(tempName);
             String[] headerType = transformLoadDataService.determineColumnType(tempName);
+
 
 
             if (csvHeaders != null && csvHeaders.length > 0) {
