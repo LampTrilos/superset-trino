@@ -38,16 +38,16 @@ public class TransformLoadDataResource {
     private final JwtService jwtService;
 
 
-    @POST
-    @Path("create-new-minio-user")
-    public Response createMinioUser(@QueryParam("username") String username, @QueryParam("password") String password) throws IOException, IOException {
-        int responseCode = transformLoadDataService.createNewMinioUser(username, password);
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            return Response.status(Response.Status.OK).entity("User created successfully").build();
-        } else {
-            return Response.status(Response.Status.OK).entity("Failed to create user. Response code:" + responseCode).build();
-        }
-    }
+//    @POST
+//    @Path("create-new-minio-user")
+//    public Response createMinioUser(@QueryParam("username") String username, @QueryParam("password") String password) throws IOException, IOException {
+//        int responseCode = transformLoadDataService.createNewMinioUser(username, password);
+//        if (responseCode == HttpURLConnection.HTTP_OK) {
+//            return Response.status(Response.Status.OK).entity("User created successfully").build();
+//        } else {
+//            return Response.status(Response.Status.OK).entity("Failed to create user. Response code:" + responseCode).build();
+//        }
+//    }
 
 
     @POST
