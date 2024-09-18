@@ -66,45 +66,7 @@ public class TransformLoadDataService {
     public void loadFileTOBucket(String tempName, String tenantId) throws Exception {
         putObjectOnBucket(tenantId, RAW_BUCKET,
                 tempName, "csv");
-
     }
-//
-//    public int createNewMinioUser(String newUser, String newSecret) throws IOException {
-//        // Admin credentials for MinIO
-//        String adminAccessKey = minioaccesskey;
-//        String adminSecretKey = miniosecretkey;
-//
-//        // MinIO endpoint
-//        String minioEndpoint = minioendpointHttps;
-//
-//        // Create the JSON request body
-//        String jsonInputString = "{\"accessKey\":\"" + newUser + "\", \"secretKey\":\"" + newSecret + "\"}";
-//
-//        // URL for the MinIO Admin API endpoint to create users
-//        URL url = new URL(minioEndpoint + "/minio/admin/v3/add-user");
-//
-//        // Set up HTTP connection
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("POST");
-//        connection.setDoOutput(true);
-//        connection.setRequestProperty("Content-Type", "application/json");
-//
-//        // Set authorization header (admin credentials)
-//        String auth = adminAccessKey + ":" + adminSecretKey;
-//        String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
-//        connection.setRequestProperty("Authorization", "Basic " + encodedAuth);
-//
-//        // Send the request
-//        try (OutputStream os = connection.getOutputStream()) {
-//            byte[] input = jsonInputString.getBytes("utf-8");
-//            os.write(input, 0, input.length);
-//        }
-//
-//        // Check the response code
-//       return connection.getResponseCode();
-//
-//    }
-
 
     public void putObjectOnBucket(String tenantiId, String bucketname, String objectname, String mimetype)
             throws Exception {
@@ -145,7 +107,7 @@ public class TransformLoadDataService {
 
     public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_"+tenantId+".temp_" + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_" + tenantId + ".temp_" + tenantId + "\n" +
                 "(\n");
         for (int i = 0; i < csvHeaders.length - 1; i++) {
             sql.append(csvHeaders[i]).append(" VARCHAR,\n");
@@ -168,7 +130,7 @@ public class TransformLoadDataService {
 
     public boolean createOrcHiveTable(String tenantId, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_"+tenantId+"."+ tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_" + tenantId + "." + tenantId + "\n" +
                 "(\n");
 //        we iterate until length - 2 because we don't need the comma (,) at the length - 1
         for (int i = 0; i < csvHeaders.length - 1; i++) {
@@ -191,7 +153,7 @@ public class TransformLoadDataService {
 
     public boolean insertIntoOrcTable(String tenantId, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("INSERT INTO  hive.hive_schema_"+tenantId+"." + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("INSERT INTO  hive.hive_schema_" + tenantId + "." + tenantId + "\n" +
                 " SELECT ");
         for (int i = 0; i < csvHeaders.length - 1; i++) {
 //            if the headerType is VARCHAR, then there is no need to try_cast
@@ -207,7 +169,7 @@ public class TransformLoadDataService {
         } else {
             sql.append("try_cast(" + csvHeaders[csvHeaders.length - 1]).append(" as " + headerType[headerType.length - 1] + ")\n");
         }
-        sql.append(" FROM hive.hive_schema_"+tenantId+".temp_" + tenantId);
+        sql.append(" FROM hive.hive_schema_" + tenantId + ".temp_" + tenantId);
 
 
         String result = trinoProcessing(sql.toString(), tenantId);
@@ -349,7 +311,7 @@ public class TransformLoadDataService {
         post.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + encoding);
         post.setHeader("content-type", "application/json");
         post.setHeader("X-Trino-Catalog", "hive");
-        post.setHeader("X-Trino-Schema", "hive_schema_"+tenantId);
+        post.setHeader("X-Trino-Schema", "hive_schema_" + tenantId);
         List<NameValuePair> params = new ArrayList<NameValuePair>();
 
 
@@ -401,13 +363,18 @@ public class TransformLoadDataService {
     }
 
     public boolean createHiveSchema(String tenantId) {
-        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_"+tenantId+" WITH (location = 's3a://hive-warehouse/')";
-        String result = trinoProcessing(sql,tenantId );
+        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_" + tenantId + " WITH (location = 's3a://hive-warehouse/')";
+        String result = trinoProcessing(sql, tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public void dropTempHiveTable(String tenantId) {
+        String sql = "DROP TABLE hive.hive_schema_" + tenantId + ".temp_" + tenantId;
+        String result = trinoProcessing(sql, tenantId);
     }
 }
 

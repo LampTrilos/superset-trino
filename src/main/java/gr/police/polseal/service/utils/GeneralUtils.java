@@ -1,14 +1,22 @@
 package gr.police.polseal.service.utils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gr.police.polseal.exception.BadRequestAlertException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.microprofile.opentracing.Traced;
+
 
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.*;
+
 
 public class GeneralUtils {
 
@@ -107,4 +115,91 @@ public class GeneralUtils {
     return null;
   }
 
+  public static JsonNode convertByteToJsonString(byte[] decodedBytes) {
+    // Convert the byte array to JSON
+    ObjectMapper objectMapper = new ObjectMapper();
+    try {
+      // Convert byte array to JsonNode
+
+        return objectMapper.readTree(decodedBytes);
+
+    } catch (IOException e) {
+      System.out.println("Error converting byte array to JSON: " + e.getMessage());
+    }
+    return null;
+  }
+
+  public static String convertJsonToCsv(JsonNode decodedAsJsonNode) {
+    StringWriter csvWriter = new StringWriter();
+
+    // CSVPrinter setup
+    try (CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader(getHeaders(decodedAsJsonNode)))) {
+
+      // If the JSON is an array of objects
+      if (decodedAsJsonNode.has("obj") && decodedAsJsonNode.get("obj").isArray()) {
+        // Get the array from the "obj" field
+        JsonNode objArray = decodedAsJsonNode.get("obj");
+        // Process each object in the array
+        for (JsonNode node : objArray) {
+          csvPrinter.printRecord(getValues(node));
+        }
+      } else if (decodedAsJsonNode.isArray()) {
+        // If the root itself is an array (unlikely in your case but handled for generality)
+        for (JsonNode node : decodedAsJsonNode) {
+          csvPrinter.printRecord(getValues(node));
+        }
+      } else {
+        // If it's a single object
+        csvPrinter.printRecord(getValues(decodedAsJsonNode));
+      }
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+
+      return csvWriter.toString(); // Return CSV string
+  }
+  // Extract headers from the JSON (keys)
+  private static String[] getHeaders(JsonNode jsonNode) {
+    Set<String> headers = new LinkedHashSet<>();
+
+    // Check if the root JSON node contains the "obj" array
+    if (jsonNode.has("obj") && jsonNode.get("obj").isArray()) {
+      // Get the first object from the array to extract the headers
+      JsonNode firstElement = jsonNode.get("obj").get(0);
+      addKeysToSet(firstElement, headers);
+    } else if (jsonNode.isArray()) {
+      // Handle the case where the root itself is an array
+      for (JsonNode node : jsonNode) {
+        addKeysToSet(node, headers);
+        break; // Only get headers from the first object
+      }
+    } else {
+      // If it's a single JSON object
+      addKeysToSet(jsonNode, headers);
+    }
+
+    return headers.toArray(new String[0]); // Convert to array
+  }
+
+  // Extract values from the JSON object for a CSV row
+  private static Object[] getValues(JsonNode jsonNode) {
+    List<Object> values = new ArrayList<>();
+    Iterator<String> fieldNames = jsonNode.fieldNames();
+
+    while (fieldNames.hasNext()) {
+      String fieldName = fieldNames.next();
+      JsonNode valueNode = jsonNode.get(fieldName);
+      values.add(valueNode != null ? valueNode.asText() : "");
+    }
+
+    return values.toArray(); // Convert to array for CSVPrinter
+  }
+
+  // Helper method to extract keys and add them to a set
+  private static void addKeysToSet(JsonNode jsonNode, Set<String> headers) {
+    Iterator<String> fieldNames = jsonNode.fieldNames();
+    while (fieldNames.hasNext()) {
+      headers.add(fieldNames.next());
+    }
+  }
 }
