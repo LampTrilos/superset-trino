@@ -14,9 +14,9 @@
         <q-file
           name="Upload your csv"
           v-model="file"
-          accept=".csv"
+          accept=".csv,.json"
           filled
-          label="Pick your csv file to upload"
+          label="Pick your csv or json file to upload"
         />
         <div>
           <q-btn label="Submit" type="submit"  color="primary"/>
@@ -127,11 +127,6 @@ function onSubmit() {
   reader.onload = () => {
     // `reader.result` contains the file data as a base64 string prefixed by the data type (e.g., "data:text/csv;base64,...")
     let base64File = reader.result.split(',')[1]; // Split off the "data:text/csv;base64," part and keep the base64 data only
-    // const data = {
-    //   file: base64File // Prepare the data for sending
-    // };
-    // console.log(typeof base64File);
-    // console.log(base64File)
 
     // Send the base64-encoded file to the server
     axios.post('/api/v1/tl/load-file-to-bucket?fileId=' + file.value.name, base64File, {

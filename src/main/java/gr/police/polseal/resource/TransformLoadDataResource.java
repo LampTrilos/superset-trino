@@ -1,5 +1,6 @@
 package gr.police.polseal.resource;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import gr.police.polseal.service.TransformLoadDataService;
 import gr.police.polseal.service.utils.GeneralUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Base64;
 
@@ -53,36 +55,41 @@ public class TransformLoadDataResource {
 
     @POST
     @Path("load-file-to-bucket")
-    public Response loadFile(String csvAsBase64, @QueryParam("fileId") String fileId) throws Exception {
+    public Response loadFile(String sentFileAsBase64, @QueryParam("fileId") String fileId) throws Exception {
         // Remove leading and trailing quotes
-        csvAsBase64 = csvAsBase64.replaceAll("^\"+|\"+$", "");
+        sentFileAsBase64 = sentFileAsBase64.replaceAll("^\"+|\"+$", "");
 
+//        we get the tenantId from the roles attribute of the sent JWT token
         String tenantId = jwt.getClaim("roles").toString().replace("\"", "")
                 .replace("[", "").replace("]", "");
+
         if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
-
             // Decode the Base64 string to byte array
-            byte[] decodedBytes = Base64.getDecoder().decode(csvAsBase64);
-            // Create a temporary CSV file
+            byte[] decodedBytes = Base64.getDecoder().decode(sentFileAsBase64);
+
+            // Create a temporary name for the temp file
             String tempName = tenantId + "_" + fileId;
-            if (!fileId.contains(".csv")){
-                tempName += ".csv";
+
+            if (fileId.contains(".json")) {
+                JsonNode decodedAsJsonNode = GeneralUtils.convertByteToJsonString(decodedBytes);
+                String finalCsv = GeneralUtils.convertJsonToCsv(decodedAsJsonNode);
+                decodedBytes = finalCsv.getBytes(StandardCharsets.UTF_8);
+
+//                we change the file name to .csv as we'll manipulate it as such from now on
+                tempName = tempName.replace(".json", ".csv");
             }
-            File csvFile = new File(tempName);
-            FileUtils.writeByteArrayToFile(csvFile, decodedBytes);
-
-            //loading the csv file into the raw-data bucket of min io
+            File tempFile = new File(tempName);
+            FileUtils.writeByteArrayToFile(tempFile, decodedBytes);
+            //loading the file into the raw-data bucket of min io
             transformLoadDataService.loadFileTOBucket(tempName, tenantId);
-
-//           we delete the in memory created file
-            Files.deleteIfExists(java.nio.file.Path.of(tempName));
 
 //        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
 //        in order to use them to our create and insert trino queries
             String[] csvHeaders = GeneralUtils.extractingCSVHeaders(tempName);
             String[] headerType = transformLoadDataService.determineColumnType(tempName);
 
-
+//           we delete the in memory created file
+            Files.deleteIfExists(java.nio.file.Path.of(tempName));
 
             if (csvHeaders != null && csvHeaders.length > 0) {
 
@@ -93,6 +100,8 @@ public class TransformLoadDataResource {
 
 //            if the schema is there, we are creating the temp hive table based on the csv
                 if (successfulSchemaCreation) {
+//                   we drop the temp table
+                    transformLoadDataService.dropTempHiveTable(tenantId);
                     successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders);
                 }
 
