@@ -26,4 +26,7 @@ public class UserDto {
   private String arithmosMitroou;
 
   private String vathmosDescription;
+
+  //The role is needed so we can create the corresponding schema inside Trino and the Minio buckets
+  private String role;
 }

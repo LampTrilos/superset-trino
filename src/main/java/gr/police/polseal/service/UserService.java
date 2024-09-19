@@ -1,4 +1,4 @@
-//package gr.police.polseal.service;
+package gr.police.polseal.service;
 //
 //import com.google.gson.Gson;
 //import gr.police.polseal.dto.EntityDto;
@@ -20,11 +20,11 @@
 //import gr.police.polseal.restclients.EmailDtoClient;
 //import gr.police.polseal.restclients.ProsopikoDtoClient;
 //import gr.police.polseal.service.utils.ServiceUtils;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 //import org.eclipse.microprofile.opentracing.Traced;
 //
-//import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.ApplicationScoped;
 //import javax.persistence.EntityManager;
 //import javax.persistence.Query;
 //import javax.persistence.criteria.*;
@@ -35,10 +35,10 @@
 //import java.util.List;
 //import java.util.stream.Collectors;
 //
-//@ApplicationScoped
-//@RequiredArgsConstructor
-//@Slf4j
-//public class UserService {
+@ApplicationScoped
+@RequiredArgsConstructor
+@Slf4j
+public class UserService {
 //
 //  private final EntityManager em;
 //
@@ -56,6 +56,21 @@
 //
 ////  private final VathmosService vathmosService;
 //
+
+
+  //@Transactional
+  //@Traced
+//  public EntityDto updateUser(UserDto userDto) {
+//    User user = userMapper.toUser(userDto);
+//    if (user.getId() != null) {
+//      User oldUser = userRepository.findByIdOptional(user.getId()).orElseThrow(() -> new NotFoundAlertException(User.class.getName()));
+//      if (oldUser.getPhone() == null || !oldUser.getPhone().equals(user.getPhone())) {
+//        // TODO send sms to confirm mobile phone
+//      }
+//      oldUser.setPhone(user.getPhone());
+//    }
+//    return new EntityDto(user.getId(), user.getLastName());
+//  }
 //  @Transactional
 //  @Traced
 //  public UserDto getUser(Long id) {
@@ -346,4 +361,4 @@
 //    return userRoleRepository.count("user.id = ?1 and depUnit.id = ?2 and ou.id = ?3 and role = 'TOPIKOS_YPEYTHYNOS'", userId, depUnitId, ouId) > 0;
 //  }
 //
-//}
+}

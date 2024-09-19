@@ -117,7 +117,8 @@ app:
       jdbc:
         timezone: 'UTC'
       database:
-        generation: create
+        #generation: create
+        generation: none
       log:
         sql: true
       liquibase:

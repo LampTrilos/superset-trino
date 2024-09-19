@@ -74,6 +74,22 @@ public class AuthorizationService {
     }
   }
 
+  //Creates and inserts a new user in Keycloak, alongside its desired role
+  //Used within the context of Supersert demo
+  public KeycloakUser enrollUserFromWS(KeycloakUser user) {
+    List<UserRepresentation> userRepresentationList = keycloakAdmin.realm("quarkus").users().search(user.getUsername(), true);
+    //If the user already exists, delete him
+    if (!CollectionUtil.isEmpty(userRepresentationList)) {
+      //log.info(String.format("Username: [%s] already exists:", user.getUsername()));
+      keycloakAdmin.realm("quarkus").users().delete(userRepresentationList.get(0).getId());
+    }
+    //---Step 2 Request to add User and reset password -----------------
+    //log.info(new Gson().toJson(user));
+    requestToAddUser(user);
+    return user;
+  }
+
+
   private KeycloakUser adduser(KeycloakUser user) {
     List<UserRepresentation> userRepresentationList = keycloakAdmin.realm("quarkus").users().search(user.getUsername(), true);
     if (!CollectionUtil.isEmpty(userRepresentationList)) {
@@ -88,6 +104,7 @@ public class AuthorizationService {
 
   public void resetUserPassword(String userId, String password) {
     UserResource userResource = keycloakAdmin.realm("quarkus").users().get(userId);
+    //The following sets the password as !userName!
     userResource.resetPassword(toCredentialPresentation(password));
     userResource.toRepresentation().getRequiredActions().removeIf(p -> p.equalsIgnoreCase(RequiredActionsEnum.UPDATE_PASSWORD.getDescription()));
   }
@@ -95,6 +112,7 @@ public class AuthorizationService {
   private void requestToAddUser(KeycloakUser user) {
     UserRepresentation currentRepresentation = toUserRepresentation(user, false);
     String userId = addUserWithRole(user, currentRepresentation);
+    //The following sets the password as !userName!
     resetUserPassword(userId, getUserPassword(user.getUsername()));
   }
 
@@ -132,14 +150,17 @@ public class AuthorizationService {
   }
 
   private String addUserWithRole(KeycloakUser user, UserRepresentation currentRepresentation) {
+    //The user is created in the next line
     Response response = keycloakAdmin.realm("quarkus").users().create(currentRepresentation);
     String userId = CreatedResponseUtil.getCreatedId(response);
     UserResource userResource = keycloakAdmin.realm("quarkus").users().get(userId);
 
+    //His roles are formed but not posted yet
     List<RoleRepresentation> roleRepresentations = new ArrayList<>();
     for (String roleName : currentRepresentation.getRealmRoles()) {
       roleRepresentations.add(keycloakAdmin.realm("quarkus").roles().get(roleName).toRepresentation());
     }
+    //Now we also send the roles for insertion
     userResource.roles().realmLevel().add(roleRepresentations);
     return userId;
   }
