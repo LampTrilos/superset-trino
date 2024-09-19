@@ -18,7 +18,7 @@ public class ApiResource {
 
     private final AuthenticationResource authenticationResource;
 
-    //private final UserResource userResource;
+    private final UserResource userResource;
 
 //  private final ItemCodeResource itemCodeResource;
 //
@@ -73,11 +73,11 @@ public class ApiResource {
         return authenticationResource;
     }
 
-//    @Authenticated
-//    @Path("/users")
-//    public UserResource userResource() {
-//        return userResource;
-//    }
+    //@Authenticated
+    @Path("/users")
+    public UserResource userResource() {
+        return userResource;
+    }
 
 //  @Authenticated
 //  @Path("/codes")

@@ -185,7 +185,7 @@ For me only changing the js policy to regex policy for Keycloak 24.0.4 worked an
 "config": {
 "code": "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
 }
-},
+}
 
 for:
 

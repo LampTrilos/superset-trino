@@ -17,6 +17,6 @@ class CustomSsoSecurityManager(SupersetSecurityManager):
             "first_name": data.get("given_name", ""),
             "last_name": data.get("family_name", ""),
             "email": data.get("email", ""),
-            "role_keys": data.get("roles", []),
-            #"role_keys": data.get("realm_access", {}).get("roles", []),
+            #"role_keys": data.get("roles", []),
+            "role_keys": data.get("realm_access", {}).get("roles", []),
         }
