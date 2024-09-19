@@ -4,7 +4,6 @@ package gr.police.polseal.dto.mapper;
 import gr.police.polseal.dto.EnumDto;
 //import gr.police.polseal.model.CompoundTransactionFileType;
 //import gr.police.polseal.model.Gender;
-import gr.police.polseal.model.TransactionType;
 import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 

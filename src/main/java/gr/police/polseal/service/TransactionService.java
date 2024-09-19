@@ -149,8 +149,8 @@ public class TransactionService {
   @ConfigProperty(name = "mode.not.verify.code", defaultValue = "false")
   boolean modeNotVerifyCode;
 
-  @Inject
-  SigningService signingservice;
+//  @Inject
+//  SigningService signingservice;
 
 
 //  @Transactional
