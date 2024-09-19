@@ -1,0 +1,72 @@
+####
+# This Dockerfile is used in order to build a container that runs the Quarkus application in JVM mode
+#
+# For LOCAL dev, BUILD the image with:
+# docker  build  --no-cache --progress=plain -f Dockerfile.backend -t quarkus-backend .
+# For N1,N2,N3 BUILD, a proxy is needed to use "microdnf update for Stage 2" so BUILD:
+# docker  build --build-arg https_proxy=http://10.1.12.227:8080 -f Dockerfile.backend -t signals_backend .
+# For LOCAL Dev, RUN the container using :
+# docker run -d --rm --name signals_backend  -p 8080:8080 --env-file ./.env  --network="signals2" signals_backend
+#
+# If you want to include the debug port into your docker image
+# you will have to expose the debug port (default 5005) like this :  EXPOSE 8080 5050
+#
+#(--env-file ./.env = take this env file for parameters)
+#
+###
+####################Backend Dockerfile####################
+#Stage 1 Image with JDK and MAVEN
+FROM maven:3.8.6-jdk-11 AS MAVEN_BUILD_IMAGE
+WORKDIR /usr/src
+
+#Make a directory and move the maven there
+RUN mkdir pol-signals
+
+WORKDIR pol-signals
+#COPY ../../../pom.xml .
+RUN ls
+COPY ../../pom.xml .
+COPY ../../parent-pom.xml .
+COPY ../../stack-pom.xml .
+#Set up the inner Maven proxy settings, it is not distributed through git, needs manual insert on every machine
+#COPY settings.xml /usr/share/maven/conf
+#Copy our custom libraries
+COPY ./src/main/deps /usr/src/pol-signals/deps
+#RUN ls -l /usr/src/pol-signals/deps
+#RUN mvn install:install-file -Dfile=/usr/src/pol-signals/deps/core-parent-1.4.0.pom -DgroupId=eu.ubitech.bitt.core -DartifactId=core-parent  -Dversion=1.4.0 -Dpackaging=pom
+RUN mvn install:install-file -Dfile=/usr/src/pol-signals/deps/core-stack-1.4.0.jar -DgroupId=eu.ubitech.bitt.core -DartifactId=core-stack -Dversion=1.4.0 -Dpackaging=jar  -DgeneratePom=true
+#RUN mvn install:install-file -Dfile=/usr/src/pol-signals/deps/core-build-tools-1.0.1.jar -DgroupId=eu.ubitech.bitt.core -DartifactId=core-build-tools -Dversion=1.0.1 -Dpackaging=jar  -DgeneratePom=true
+
+# To resolve dependencies in a safe way (no re-download when the source code changes)
+RUN mvn clean package -Dmaven.main.skip -Dmaven.test.skip && rm -r target
+# To package the application
+COPY ./ /usr/src/pol-signals/
+#APPLICATIONCONTEXT comes from docker-compose (its the context before all api calls)
+ARG APPLICATIONCONTEXT=" "
+
+#WORKDIR /usr/src/pol-signals/
+
+RUN mvn package -DskipTests
+
+
+
+#Stage 2 to mount the jar
+FROM amazoncorretto:19.0.1-alpine
+# Add app user
+ARG APPLICATION_USER=appuser
+RUN adduser --no-create-home -u 1000 -D $APPLICATION_USER
+
+# Configure working directory
+RUN mkdir /artifacts && chmod -R 777 /artifacts && chown -R $APPLICATION_USER /artifacts
+
+
+USER 1000
+
+#COPY --from=MAVEN_BUILD_IMAGE --chown=1000:1000 /usr/src/pol-signals/target/lib/ /artifacts/lib/
+COPY --from=MAVEN_BUILD_IMAGE --chown=1000:1000 /usr/src/pol-signals/target/*.jar /artifacts/
+#COPY --from=MAVEN_BUILD_IMAGE --chown=1000:1000 /usr/src/pol-signals/target/app/ artifacts/app/
+#COPY --from=MAVEN_BUILD_IMAGE --chown=1000:1000 /usr/src/pol-signals/target/quarkus/ /artifacts/quarkus/
+
+EXPOSE 8080
+ENTRYPOINT [ "java", "-jar", "/artifacts/superset-1.0-SNAPSHOT-runner.jar" ]
+#######################################################

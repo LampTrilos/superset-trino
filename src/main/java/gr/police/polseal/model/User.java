@@ -10,7 +10,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Table(name = "userp")
 public class User {
 

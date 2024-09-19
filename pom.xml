@@ -2,16 +2,25 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>pol-seal</artifactId>
-  <groupId>gr.police.polseal</groupId>
+  <artifactId>superset</artifactId>
+  <groupId>gr.police.superset</groupId>
   <version>1.0-SNAPSHOT</version>
 
-  <parent>
-    <groupId>eu.ubitech.bitt.core</groupId>
-    <artifactId>core-parent</artifactId>
-    <version>1.4.0</version>
-    <relativePath/>
-  </parent>
+<!--  <parent>-->
+<!--    <groupId>eu.ubitech.bitt.core</groupId>-->
+<!--    <artifactId>core-parent</artifactId>-->
+<!--    <version>1.4.0</version>-->
+<!--    <relativePath>parent-pom.xml</relativePath>-->
+<!--  </parent>-->
+      <parent>
+        <groupId>eu.ubitech.bitt.core</groupId>
+        <artifactId>core-stack</artifactId>
+        <version>1.4.0</version>
+<!--        <relativePath>stack-pom.xml</relativePath>-->
+        <relativePath>stack-pom.xml</relativePath>
+      </parent>
+
+
 
   <properties>
     <assertj.version>3.23.1</assertj.version>
@@ -35,7 +44,11 @@
       <artifactId>core-stack</artifactId>
       <version>${core.stack.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.keycloak</groupId>
+      <artifactId>keycloak-admin-client</artifactId>
+      <version>20.0.1</version>
+    </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-rest-client</artifactId>
@@ -435,10 +448,10 @@
   </repositories>
 
 
-  <pluginRepositories>
-    <pluginRepository>
-      <id>gitlab-maven</id>
-      <url>https://gitlab.ubitech.eu/api/v4/groups/bitt/-/packages/maven</url>
-    </pluginRepository>
-  </pluginRepositories>
+<!--  <pluginRepositories>-->
+<!--    <pluginRepository>-->
+<!--      <id>gitlab-maven</id>-->
+<!--      <url>https://gitlab.ubitech.eu/api/v4/groups/bitt/-/packages/maven</url>-->
+<!--    </pluginRepository>-->
+<!--  </pluginRepositories>-->
 </project>
