@@ -87,7 +87,7 @@ public class UserResource {
             boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(kuser.getRealmRoles().get(0));
 
             if (successfulSchemaCreation) {
-                System.out.println("Successful creation of hive-schema"+kuser.getRealmRoles().get(0));
+                System.out.println("Successful creation of hive-schema: "+kuser.getRealmRoles().get(0));
                 response = Response.ok(kuser).build();
                 return response;
             }

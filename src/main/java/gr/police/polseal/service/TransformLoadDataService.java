@@ -364,6 +364,7 @@ public class TransformLoadDataService {
 
     public boolean createHiveSchema(String tenantId) {
         String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_" + tenantId + " WITH (location = 's3a://hive-warehouse-"+tenantId+"/')";
+        //String sql = "CREATE SCHEMA IF NOT EXISTS hive." + tenantId + " WITH (location = 's3a://"+tenantId+"/')";
         String result = trinoProcessing(sql, tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
@@ -374,6 +375,7 @@ public class TransformLoadDataService {
 
     public void dropTempHiveTable(String tenantId) {
         String sql = "DROP TABLE hive.hive_schema_" + tenantId + ".temp_" + tenantId;
+        //String sql = "DROP TABLE hive." + tenantId + ".temp_" + tenantId;
         String result = trinoProcessing(sql, tenantId);
     }
 }

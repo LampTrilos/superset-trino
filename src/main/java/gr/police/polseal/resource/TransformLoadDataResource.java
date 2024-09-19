@@ -48,11 +48,41 @@ public class TransformLoadDataResource {
         sentFileAsBase64 = sentFileAsBase64.replaceAll("^\"+|\"+$", "");
 
 //        we get the tenantId from the roles attribute of the sent JWT token
-        String tenantId = jwt.getClaim("roles").toString().replace("\"", "")
+//        String tenantId = jwt.getClaim("roles").toString().replace("\"", "")
+//                .replace("[", "").replace("]", "");
+
+        String tenantId = jwt.getClaim("realm_access").toString().replace("\"", "")
                 .replace("[", "").replace("]", "");
 
-        if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
-            // Decode the Base64 string to byte array
+        // Step 1: Remove all non-alphabetic characters except for spaces
+        String cleanedInput = tenantId.replaceAll("[^a-zA-Z, ]", "");
+
+        // Step 2: Split the string into words and filter out words that contain 'User' or 'quarkus'
+        String[] roles = cleanedInput.split(",");
+        StringBuilder filteredRoles = new StringBuilder();
+
+        for (String role : roles) {
+            // Only keep roles that do not contain 'User' or 'quarkus'
+            if (!role.contains("User") && !role.contains("quarkus")) {
+                filteredRoles.append(role).append(",");
+            }
+        }
+
+        // Remove trailing comma if needed
+        if (filteredRoles.length() > 0 && filteredRoles.charAt(filteredRoles.length() - 1) == ',') {
+            filteredRoles.setLength(filteredRoles.length() - 1);
+        }
+        tenantId = filteredRoles.toString();
+
+        // Output the final filtered result
+        System.out.println(filteredRoles.toString());
+
+
+
+
+
+            if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
+                // Decode the Base64 string to byte array
             byte[] decodedBytes = Base64.getDecoder().decode(sentFileAsBase64);
 
             // Create a temporary name for the temp file
