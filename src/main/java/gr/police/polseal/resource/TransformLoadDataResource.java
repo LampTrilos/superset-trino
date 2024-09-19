@@ -3,6 +3,7 @@ package gr.police.polseal.resource;
 import com.fasterxml.jackson.databind.JsonNode;
 import gr.police.polseal.service.TransformLoadDataService;
 import gr.police.polseal.service.utils.GeneralUtils;
+import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -40,19 +41,6 @@ public class TransformLoadDataResource {
     @Inject
     JsonWebToken jwt;
 
-
-//    @POST
-//    @Path("create-new-minio-user")
-//    public Response createMinioUser(@QueryParam("username") String username, @QueryParam("password") String password) throws IOException, IOException {
-//        int responseCode = transformLoadDataService.createNewMinioUser(username, password);
-//        if (responseCode == HttpURLConnection.HTTP_OK) {
-//            return Response.status(Response.Status.OK).entity("User created successfully").build();
-//        } else {
-//            return Response.status(Response.Status.OK).entity("Failed to create user. Response code:" + responseCode).build();
-//        }
-//    }
-
-
     @POST
     @Path("load-file-to-bucket")
     public Response loadFile(String sentFileAsBase64, @QueryParam("fileId") String fileId) throws Exception {
@@ -80,8 +68,10 @@ public class TransformLoadDataResource {
             }
             File tempFile = new File(tempName);
             FileUtils.writeByteArrayToFile(tempFile, decodedBytes);
+
             //loading the file into the raw-data bucket of min io
-            transformLoadDataService.loadFileTOBucket(tempName, tenantId);
+            MinioClient minioClient = transformLoadDataService.createMinioClient();
+            transformLoadDataService.loadFileTOBucket(minioClient, tempName, tenantId);
 
 //        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
 //        in order to use them to our create and insert trino queries
