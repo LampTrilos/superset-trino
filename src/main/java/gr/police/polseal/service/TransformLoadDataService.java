@@ -9,6 +9,7 @@ import io.minio.BucketExistsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.UploadObjectArgs;
+import io.minio.errors.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
@@ -25,9 +26,8 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import javax.enterprise.context.ApplicationScoped;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -63,46 +63,46 @@ public class TransformLoadDataService {
 
 
     //    we load the File into the  raw-data minio bucket based on the tenant id
-    public void loadFileTOBucket(String tempName, String tenantId) throws Exception {
-        putObjectOnBucket(tenantId, RAW_BUCKET,
-                tempName, "csv");
+    public void loadFileTOBucket(MinioClient minioClient, String tempName, String tenantId) throws Exception {
+        putObjectOnBucket(minioClient, tenantId, RAW_BUCKET,
+                tempName);
     }
 
-    public void putObjectOnBucket(String tenantiId, String bucketname, String objectname, String mimetype)
-            throws Exception {
-
-//        creation of the minio client
-        MinioClient minioClient = MinioClient.builder()
+    public MinioClient createMinioClient() {
+        //        creation of the minio client
+        return MinioClient.builder()
                 .endpoint(minioendpoint)
                 .credentials(minioaccesskey, miniosecretkey)
                 .build();
 
-////        creation of the minio client
-//        MinioClient minioClient = MinioClient.builder()
-//                .endpoint(minioendpoint)
-//                .credentials("testUser", "test123")
-//                .build();
-
-
-        boolean foundRawData = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketname).build());
+    }
+//    we create raw-data and hive-warehouse buckets
+    public void createBuckets (MinioClient minioClient, String tenantId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String rawDataBucket = "raw-data-"+tenantId;
+        String hiveWarehouseBucket = "hive-warehouse-"+tenantId;
+        boolean foundRawData = minioClient.bucketExists(BucketExistsArgs.builder().bucket(rawDataBucket).build());
         if (!foundRawData) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketname).build());
-            System.out.println("Bucket " + bucketname + " created ");
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(rawDataBucket).build());
+            System.out.println("Bucket " + rawDataBucket + " created ");
         }
+//        if it doesn't exist, we create the hive-warehouse
+        boolean foundHiveWareHouse = minioClient.bucketExists(BucketExistsArgs.builder().bucket(hiveWarehouseBucket).build());
+        if (!foundHiveWareHouse) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(hiveWarehouseBucket).build());
+            System.out.println("Bucket "+ hiveWarehouseBucket +" created ");
+        } else {
+            System.out.println("Bucket "+hiveWarehouseBucket+" already exists.");
+        }
+    }
+
+    public void putObjectOnBucket(MinioClient minioClient, String tenantiId, String bucketname, String objectname)
+            throws Exception {
+
         minioClient.uploadObject(UploadObjectArgs.builder()
                 .bucket(bucketname)
                 .object(tenantiId + "/" + objectname)
                 .filename(objectname)
                 .build());
-
-//        if it doesn't exist, we create the hive-warehouse
-        boolean foundHiveWareHouse = minioClient.bucketExists(BucketExistsArgs.builder().bucket("hive-warehouse").build());
-        if (!foundHiveWareHouse) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket("hive-warehouse").build());
-            System.out.println("Bucket hive-warehouse created ");
-        } else {
-            System.out.println("Bucket hive-warehouse already exists.");
-        }
     }
 
     public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
@@ -363,7 +363,8 @@ public class TransformLoadDataService {
     }
 
     public boolean createHiveSchema(String tenantId) {
-        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_" + tenantId + " WITH (location = 's3a://hive-warehouse/')";
+        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_" + tenantId + " WITH (location = 's3a://hive-warehouse-"+tenantId+"/')";
+        //String sql = "CREATE SCHEMA IF NOT EXISTS hive." + tenantId + " WITH (location = 's3a://"+tenantId+"/')";
         String result = trinoProcessing(sql, tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
@@ -374,6 +375,7 @@ public class TransformLoadDataService {
 
     public void dropTempHiveTable(String tenantId) {
         String sql = "DROP TABLE hive.hive_schema_" + tenantId + ".temp_" + tenantId;
+        //String sql = "DROP TABLE hive." + tenantId + ".temp_" + tenantId;
         String result = trinoProcessing(sql, tenantId);
     }
 }

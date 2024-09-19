@@ -1,34 +1,28 @@
 package gr.police.polseal.resource;
 //
 //import gr.police.polseal.dto.PermissionResDto;
+
 import gr.police.polseal.dto.KeycloakUser;
 import gr.police.polseal.dto.UserDto;
-//import gr.police.polseal.dto.options.extensions.ToOptionsUser;
-//import gr.police.polseal.model.permissions.PermissionAction;
-//import gr.police.polseal.model.permissions.PermissionEntity;
-//import gr.police.polseal.model.permissions.Role;
-//import gr.police.polseal.restclients.EmailDtoClient;
-//import gr.police.polseal.restclients.HumanResourceClient;
-//import gr.police.polseal.restclients.ProsopikoDtoClient;
-import gr.police.polseal.service.*;
-import io.quarkus.security.Authenticated;
-import io.quarkus.security.UnauthorizedException;
+import gr.police.polseal.service.AuthorizationService;
+import gr.police.polseal.service.TransformLoadDataService;
+import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.microprofile.openapi.annotations.enums.SecuritySchemeType;
-import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
-import org.eclipse.microprofile.openapi.annotations.security.SecurityScheme;
-import org.eclipse.microprofile.openapi.annotations.security.SecuritySchemes;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-//
-import javax.inject.Inject;
+
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 //
 //
 @Singleton
@@ -41,9 +35,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class UserResource {
-//
-  //private final UserService userService;
-  private final AuthorizationService authService;
+    //
+    //private final UserService userService;
+    private final AuthorizationService authService;
+
+    private final TransformLoadDataService transformLoadDataService;
 //
 //  //private final PermissionService permissionService;
 //
@@ -59,40 +55,48 @@ public class UserResource {
 //
 
 
-  @POST
-  @Path("/enrollUser")
-  public Response enrollUser(@NotNull UserDto userDto) {
-      Response response = null;
-      try {
-          //First we make a new Keycloak user object
-          Map<String, String> attributeMap = new HashMap<>();
-          //Let's make the list of realm roles, in this case it will be just one and based on this role, the Minio bucket and the Trino schema will be created
-          List<String> roles = new ArrayList<>();
-          roles.add(userDto.getRole());
-          KeycloakUser kuser = KeycloakUser.builder()
-                  .username(userDto.getId())
-                  .email(userDto.getEmail())
-                  .enabled("true")
-                  .emailVerified(true)
-                  .firstName(userDto.getFirstName())
-                  .lastName(userDto.getLastName())
-                  .attributes(attributeMap)
-                  //Realm wide roles
-                  .realmRoles(roles)
-                  .build();
-          kuser = authService.enrollUserFromWS(kuser);
-          //If all went well and the Keycloak user was created, proceed to make the Minio bucker and Trino schema based on the user role
-          //if (kuser!=null) {
-              response =  Response.ok(kuser).build();
-              return response;
-          //}
-      }
-      catch(Exception ex) {
-          response =  Response.status(500).entity(ex.getMessage()).build();
-          return response;
-      }
-  }
+    @POST
+    @Path("/enrollUser")
+    public Response enrollUser(@NotNull UserDto userDto) {
+        Response response = null;
+        try {
+            //First we make a new Keycloak user object
+            Map<String, String> attributeMap = new HashMap<>();
+            //Let's make the list of realm roles, in this case it will be just one and based on this role, the Minio bucket and the Trino schema will be created
+            List<String> roles = new ArrayList<>();
+            roles.add(userDto.getRole());
+            KeycloakUser kuser = KeycloakUser.builder()
+                    .username(userDto.getId())
+                    .email(userDto.getEmail())
+                    .enabled("true")
+                    .emailVerified(true)
+                    .firstName(userDto.getFirstName())
+                    .lastName(userDto.getLastName())
+                    .attributes(attributeMap)
+                    //Realm wide roles
+                    .realmRoles(roles)
+                    .build();
+            kuser = authService.enrollUserFromWS(kuser);
+            //If all went well and the Keycloak user was created, proceed to make the Minio bucket and Trino schema based on the user role
 
+//           firstly we create a minio client
+            MinioClient minioClient = transformLoadDataService.createMinioClient();
+//           then we create the minio buckets raw-data and hive-warehouse, both followed by the KeycloakUser Role
+            transformLoadDataService.createBuckets(minioClient, kuser.getRealmRoles().get(0));
+
+            boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(kuser.getRealmRoles().get(0));
+
+            if (successfulSchemaCreation) {
+                System.out.println("Successful creation of hive-schema: "+kuser.getRealmRoles().get(0));
+                response = Response.ok(kuser).build();
+                return response;
+            }
+        } catch (Exception ex) {
+            response = Response.status(500).entity(ex.getMessage()).build();
+            return response;
+        }
+        return null;
+    }
 
 
 //  @GET

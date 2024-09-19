@@ -11,20 +11,20 @@
         <h5 class="q-my-sm  bg-primary" style="margin-left: -1rem;">Έλεγχος αεροδρομίων</h5>
         <q-space  class="bg-primary" />
       </div>
-<!--      <q-list>-->
-<!--        <SideBarItem-->
-<!--          :key="t('dashboard')"-->
-<!--          v-bind="{-->
-<!--            title: t('notification', 2),-->
-<!--            icon: 'notifications',-->
-<!--            link: {-->
-<!--              name: 'Dashboard',-->
-<!--            },-->
-<!--            visible: true,-->
-<!--          }"-->
-<!--          dark-->
-<!--        />-->
-<!--      </q-list>-->
+      <!--      <q-list>-->
+      <!--        <SideBarItem-->
+      <!--          :key="t('dashboard')"-->
+      <!--          v-bind="{-->
+      <!--            title: t('notification', 2),-->
+      <!--            icon: 'notifications',-->
+      <!--            link: {-->
+      <!--              name: 'Dashboard',-->
+      <!--            },-->
+      <!--            visible: true,-->
+      <!--          }"-->
+      <!--          dark-->
+      <!--        />-->
+      <!--      </q-list>-->
       <q-list
         class="q-mb-md"
         v-if="leftSideBarLinks.filter((lnk) => !!lnk.visible).length > 0"
@@ -40,46 +40,46 @@
         />
         <q-separator class="q-my-sm" />
       </q-list>
-<!--      <q-list>-->
-<!--        <q-item-label header class="q-px-md text-white"-->
-<!--          >Ο λογαριασμός μου</q-item-label-->
-<!--        >-->
-<!--        <SideBarItem-->
-<!--          v-for="link in myLeftSideBarLinks.filter((lnk) => !!lnk.visible)"-->
-<!--          :key="link.title"-->
-<!--          v-bind="link"-->
-<!--          dark-->
-<!--        />-->
-<!--      </q-list>-->
+      <!--      <q-list>-->
+      <!--        <q-item-label header class="q-px-md text-white"-->
+      <!--          >Ο λογαριασμός μου</q-item-label-->
+      <!--        >-->
+      <!--        <SideBarItem-->
+      <!--          v-for="link in myLeftSideBarLinks.filter((lnk) => !!lnk.visible)"-->
+      <!--          :key="link.title"-->
+      <!--          v-bind="link"-->
+      <!--          dark-->
+      <!--        />-->
+      <!--      </q-list>-->
       <div class="row q-mt-lg q-mb-xs">
         <div class="q-ml-md">VERSION-DATE-DEPLOYED</div>
       </div>
     </q-drawer>
-<!-- No need for right drawer at the moment-->
-<!--    <q-drawer v-model="rightDrawerOpen" bordered side="right" :width="600">-->
-<!--      <div class="q-pa-md row items-center">-->
-<!--        <div class="col-1">-->
-<!--          <q-btn round unelevated icon="sym_o_close" @click="toggleRightDrawer">-->
-<!--            <q-tooltip>{{ t('close') }}</q-tooltip>-->
-<!--          </q-btn>-->
-<!--        </div>-->
-<!--        <div class="col-11">-->
-<!--          <div class="text-h5">{{ t('notification', 2) }}</div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div>-->
-<!--        <q-list separator>-->
-<!--          <NotificationItem-->
-<!--            v-for="notification in notifications"-->
-<!--            :key="notification.id"-->
-<!--            v-bind="notification"-->
-<!--          />-->
-<!--        </q-list>-->
-<!--      </div>-->
-<!--    </q-drawer>-->
+    <!-- No need for right drawer at the moment-->
+    <!--    <q-drawer v-model="rightDrawerOpen" bordered side="right" :width="600">-->
+    <!--      <div class="q-pa-md row items-center">-->
+    <!--        <div class="col-1">-->
+    <!--          <q-btn round unelevated icon="sym_o_close" @click="toggleRightDrawer">-->
+    <!--            <q-tooltip>{{ t('close') }}</q-tooltip>-->
+    <!--          </q-btn>-->
+    <!--        </div>-->
+    <!--        <div class="col-11">-->
+    <!--          <div class="text-h5">{{ t('notification', 2) }}</div>-->
+    <!--        </div>-->
+    <!--      </div>-->
+    <!--      <div>-->
+    <!--        <q-list separator>-->
+    <!--          <NotificationItem-->
+    <!--            v-for="notification in notifications"-->
+    <!--            :key="notification.id"-->
+    <!--            v-bind="notification"-->
+    <!--          />-->
+    <!--        </q-list>-->
+    <!--      </div>-->
+    <!--    </q-drawer>-->
 
     <q-page-container >
-<!--      <q-page padding v-bind:style="elasBackground">-->
+      <!--      <q-page padding v-bind:style="elasBackground">-->
       <q-page padding >
         <BreadcrumbsList :breadcrumbs="breadcrumbs" />
         <router-view :key="$route.fullPath"/>
@@ -128,7 +128,7 @@ const elasBackground = computed(() => {
 
 
 // permissions
-getMyPermissions();
+// getMyPermissions();
 
 //Dont know what this is for
 // const myLeftSideBarLinks = computed(() => {
@@ -271,21 +271,21 @@ provide("logout", logout)
 const { breadcrumbs } = storeToRefs(useBreadcrumbsStore());
 
 // departments
-const { data: departments } = useQuery({
-  queryKey: ['getMyDepartments'],
-  queryFn: () => getMyDepartments(),
-});
-
-function changeDepartment(val: any) {
-  console.log('Change department id: ' + val);
-  enabledNotifications.value = false;
-  loggingOut.value = true;
-  router.push({
-    name: 'AutoLogin',
-    query: { depunitid: val },
-  });
-}
-provide("changeDepartment", changeDepartment)
+// const { data: departments } = useQuery({
+//   queryKey: ['getMyDepartments'],
+//   queryFn: () => getMyDepartments(),
+// });
+//
+// function changeDepartment(val: any) {
+//   console.log('Change department id: ' + val);
+//   enabledNotifications.value = false;
+//   loggingOut.value = true;
+//   router.push({
+//     name: 'AutoLogin',
+//     query: { depunitid: val },
+//   });
+// }
+// provide("changeDepartment", changeDepartment)
 
 //timer
 let dashboardUnmounted = false;
@@ -349,13 +349,13 @@ onBeforeUnmount(() => {
   dashboardUnmounted = true;
 });
 
-let roles = ref('');
-axios
-  .get('/api/v1/users/my-roles')
-  .then((res) => {
-      roles.value = res.data;
-  })
-  .catch((error) => {
-      console.log(error);
-  })
+// let roles = ref('');
+// axios
+//   .get('/api/v1/users/my-roles')
+//   .then((res) => {
+//       roles.value = res.data;
+//   })
+//   .catch((error) => {
+//       console.log(error);
+//   })
 </script>

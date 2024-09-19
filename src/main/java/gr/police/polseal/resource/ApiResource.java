@@ -43,11 +43,6 @@ public class ApiResource {
 
     private final TransactionTemplateResource transactionTemplateResource;
 
-    private final SealingApplicationResource sealingApplicationResource;
-
-    private final SealingTemplateResource sealingTemplateResource;
-
-    private final ChallengeChannelResource challengeChannelResource;
 
     private final TransformLoadDataResource transformLoadDataResource;
 
@@ -133,23 +128,6 @@ public class ApiResource {
         return transactionTemplateResource;
     }
 
-
-    @Path("/sealing-applications")
-    public SealingApplicationResource sealingApplicationResource() {
-        return sealingApplicationResource;
-    }
-
-    @Authenticated
-    @Path("/sealing-templates")
-    public SealingTemplateResource sealingTemplateResource() {
-        return sealingTemplateResource;
-    }
-
-    @Authenticated
-    @Path("/challenge-channels")
-    public ChallengeChannelResource challengeChannelResource() {
-        return challengeChannelResource;
-    }
 
    //todo na bgei to sxolio sto authenticated
 //    @Authenticated

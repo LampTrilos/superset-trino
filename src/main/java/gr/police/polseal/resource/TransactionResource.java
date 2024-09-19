@@ -9,7 +9,6 @@ import gr.police.polseal.dto.options.extensions.ToOptionsLogTransaction;
 import gr.police.polseal.exception.BadRequestAlertException;
 import gr.police.polseal.exception.ErrorMessage;
 import gr.police.polseal.exception.FailAlertException;
-import gr.police.polseal.model.TransactionType;
 import gr.police.polseal.model.permissions.PermissionAction;
 import gr.police.polseal.model.permissions.PermissionEntity;
 import gr.police.polseal.model.permissions.Role;

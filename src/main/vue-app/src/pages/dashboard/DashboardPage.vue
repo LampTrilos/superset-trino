@@ -14,9 +14,9 @@
         <q-file
           name="Upload your csv"
           v-model="file"
-          accept=".csv,.json"
+          accept=".csv"
           filled
-          label="Pick your csv or json file to upload"
+          label="Pick your csv file to upload"
         />
         <div>
           <q-btn label="Submit" type="submit"  color="primary"/>
@@ -99,6 +99,7 @@ import {reactive, ref} from 'vue';
 import ButtonSearch from 'components/buttons/ButtonSearch.vue';
 import ButtonSearchReset from 'components/buttons/ButtonSearchReset.vue';
 import axios from "axios";
+import {Notify} from "quasar";
 
 const {formatDateTimeLocale} = useDateFormatter();
 
@@ -116,8 +117,11 @@ const file = ref(null);
 function onSubmit() {
   //console.log(file)
   if (!file.value) {
-    console.error('No file selected');
-    window.alert('No file selected')
+    //console.error('No file selected');
+    Notify.create({
+      message: t('Please select a file'),
+      color: 'amber-9'
+    });
     return;
   }
 
@@ -127,6 +131,11 @@ function onSubmit() {
   reader.onload = () => {
     // `reader.result` contains the file data as a base64 string prefixed by the data type (e.g., "data:text/csv;base64,...")
     let base64File = reader.result.split(',')[1]; // Split off the "data:text/csv;base64," part and keep the base64 data only
+    // const data = {
+    //   file: base64File // Prepare the data for sending
+    // };
+    // console.log(typeof base64File);
+    // console.log(base64File)
 
     // Send the base64-encoded file to the server
     axios.post('/api/v1/tl/load-file-to-bucket?fileId=' + file.value.name, base64File, {
@@ -135,10 +144,18 @@ function onSubmit() {
       }
     })
       .then(response => {
-        console.log('File uploaded successfully', response);
+        Notify.create({
+          message: t('File successfully uploaded'),
+          color: 'green'
+        });
+        //console.log('File uploaded successfully', response);
       })
       .catch(error => {
-        console.error('Error uploading file', error);
+        Notify.create({
+          message: t('Error while uploading file'),
+          color: 'red'
+        });
+        //console.error('Error uploading file', error);
       });
   };
 
