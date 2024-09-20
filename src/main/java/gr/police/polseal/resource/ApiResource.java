@@ -26,7 +26,7 @@ public class ApiResource {
 //
 //  private final BalanceResource balanceResource;
 
-    private final TransactionResource transactionResource;
+   // private final TransactionResource transactionResource;
 
 //  private final ItemResource itemResource;
 
@@ -34,14 +34,14 @@ public class ApiResource {
 
 //  private final EnumService enumService;
 
-    private final NotificationResource notificationResource;
+   // private final NotificationResource notificationResource;
 
 
-    private final OuResource ouResource;
+ //   private final OuResource ouResource;
 
 //  private final ItemEnumResource itemEnumResource;
 
-    private final TransactionTemplateResource transactionTemplateResource;
+ //   private final TransactionTemplateResource transactionTemplateResource;
 
 
     private final TransformLoadDataResource transformLoadDataResource;
@@ -92,11 +92,11 @@ public class ApiResource {
 //    return balanceResource;
 //  }
 
-    @Authenticated
-    @Path("/transactions")
-    public TransactionResource transactionResource() {
-        return transactionResource;
-    }
+//    @Authenticated
+//    @Path("/transactions")
+//    public TransactionResource transactionResource() {
+//        return transactionResource;
+//    }
 
 //  @Authenticated
 //  @Path("/items")
@@ -116,17 +116,17 @@ public class ApiResource {
 //        return permissionResource;
 //    }
 
-    @Authenticated
-    @Path("/notifications")
-    public NotificationResource notificationResource() {
-        return notificationResource;
-    }
-
-    @Authenticated
-    @Path("transaction-templates")
-    public TransactionTemplateResource transactionTemplateResource() {
-        return transactionTemplateResource;
-    }
+//    @Authenticated
+//    @Path("/notifications")
+//    public NotificationResource notificationResource() {
+//        return notificationResource;
+//    }
+//
+//    @Authenticated
+//    @Path("transaction-templates")
+//    public TransactionTemplateResource transactionTemplateResource() {
+//        return transactionTemplateResource;
+//    }
 
 
    //todo na bgei to sxolio sto authenticated
@@ -174,11 +174,11 @@ public class ApiResource {
 //  }
 
 
-
-    @Path("/ous")
-    public OuResource ouResource() {
-        return ouResource;
-    }
+//
+//    @Path("/ous")
+//    public OuResource ouResource() {
+//        return ouResource;
+//    }
 
 //  @Path("/excel")
 //  public ExcelResource excelResource() {

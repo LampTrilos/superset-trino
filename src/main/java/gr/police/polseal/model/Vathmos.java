@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+//@Entity
 @Table(name = "vathmos")
 public class Vathmos extends PanacheEntityBase {
 

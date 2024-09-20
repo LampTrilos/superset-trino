@@ -11,8 +11,8 @@
     "lint": "eslint --ext .js,.ts,.vue ./",
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
-    "build": "QENV=PROD quasar build",
-    "prod": "QENV=PROD quasar build",
+    "build": "set QENV=PROD && quasar build",
+    "prod": "quasar build",
     "test:unit:ui": "vitest --ui",
     "test:unit": "vitest",
     "test:unit:ci": "vitest run"

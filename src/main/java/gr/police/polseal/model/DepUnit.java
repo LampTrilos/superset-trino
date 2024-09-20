@@ -13,7 +13,7 @@ import javax.persistence.*;
 // Γενική υπηρεσία
 @Getter
 @Setter
-@Entity
+//@Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

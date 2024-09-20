@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
+//@Entity
 @Table(name = "transactiontemplaterecord")
 public class TransactionTemplateRecord extends AuditableEntity {
 

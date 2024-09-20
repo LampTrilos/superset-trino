@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Getter
 @Setter
-@Entity
+//@Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor

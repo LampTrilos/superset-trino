@@ -13,13 +13,13 @@ quarkus:
     default-transaction-timeout: 180
 
 
-#  datasource:
-#    username:
-#    password:
-#    db-kind: h2
-#    jdbc:
-#      url: jdbc:h2:tcp://localhost/mem:test
-#      tracing: true
+  datasource:
+    #username:
+    #password:
+    #db-kind: h2
+    jdbc: false
+      #url: jdbc:h2:tcp://localhost/mem:test
+      #tracing: true
 
 
 #  hibernate-orm:

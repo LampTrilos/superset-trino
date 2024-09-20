@@ -26,6 +26,7 @@ To add the roles inside the token go: Clients -> backend-service -> Client Detai
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
 Minio: `http://localhost:9001/` (username: `minio`, password: `minio123`)<br>
 Superset: `http://localhost:8088/` (username: `admin`, password: `admin`)<br>
+Vue Frontend: http://localhost:8081/
 
 
  

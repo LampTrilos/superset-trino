@@ -1,0 +1,65 @@
+#################Frontend Dockerfile###################
+#To BUILD for DEV :
+#docker  build -f Dockerfile.frontend -t vue-frontend .
+#To BUILD for N1,N2,N3 :
+#docker  build --build-arg HTTP_PROXY=http://10.1.12.227:8080 --build-arg HTTPS_PROXY=http://10.1.12.227:8080 --build-arg BASE_URL=signals2tst -f Dockerfile.signalsfrontend -t signals_frontend .
+#To RUN:
+#docker run -d --name vue-frontend  -p 8081:1080 --env-file ./.env --network="signals"  vue-frontend
+# --rm = remove when stopped, -d = in background
+
+#Stage 1 Image that will create production files
+FROM node:20.17.0-alpine AS NODE_BUILD_IMAGE
+WORKDIR /app
+COPY package*.json ./
+#N1-3 machines have trouble with proxy, so each consecutive install draws a part of the packages
+RUN npm install; exit 0
+RUN npm install; exit 0
+RUN npm install; exit 0
+RUN npm install; exit 0
+COPY ./ .
+#Replace Base url (main context) of application because it wouldnt pick up during build
+#Main Context of app # Is passed from docker-compose-build.yml
+ARG SIGNALS_BASE_URL
+#Vue config file to be used
+#ARG VUE_CONFIG_FILE
+#ARG VUE_APP_LOGOUTPATH
+#ARG VUE_APP_LOGINPATH
+#Replace Base url dynamically
+#RUN sed -i 's/process.env.BASE_URL/'"'${SIGNALS_BASE_URL}'"'/g' ./src/router/index.js
+RUN npm run build
+
+#Stage 2 Image that will host the files in an nginx http server
+FROM nginx:1.23.3 as vue_frontend
+#Set correct timezone
+ENV TZ=Europe/Athens
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Add app user
+ARG APPLICATION_USER=appuser
+RUN adduser --no-create-home -u 1000 $APPLICATION_USER
+
+
+RUN mkdir /app
+ARG SIGNALS_BASE_URL
+COPY --from=NODE_BUILD_IMAGE ../resources/META-INF/resources /app/
+#General configuration of Nginx, doesnt refer to any servers
+COPY nginx.conf /etc/nginx/nginx.conf
+#Copy the keys for ssl. Certs will not be uploaded to git, they need to be copied into the directory manually
+#COPY ./certificate /etc/nginx/certs
+#.template files located in /etc/nginx/templates/ override any  /etc/nginx/conf.d/ files, so we can use .env variables for ports, servers, etc..
+COPY default.conf.template /etc/nginx/templates/
+
+
+#Change ownerships to nginx user
+RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
+        chown -R nginx:nginx /var/cache/nginx && \
+        chown -R nginx:nginx /var/log/nginx && \
+        chown -R nginx:nginx /etc/nginx/conf.d && \
+        chown -R nginx:nginx /etc/nginx/nginx.conf #&& \
+        #chown -R nginx:nginx /etc/nginx/certs && \
+        #chown -R nginx:nginx /etc/nginx/templates
+RUN touch /var/run/nginx.pid && \
+        chown -R nginx:nginx /var/run/nginx.pid
+#USER nginx
+CMD ["nginx", "-g", "daemon off;"]
+#######################################################
+
