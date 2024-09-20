@@ -1,0 +1,114 @@
+  #The values here are substituted at RUNTIME
+  #Redirect the first call of tws from port 80 to port 443
+  server {
+      listen         1080 ;
+      #server_name    ${SERVER_NAME_PUBLIC};
+      server_name    localhost;
+      #Disable any limits to avoid HTTP 413 for large image uploads
+      client_max_body_size 20M;
+      proxy_read_timeout 600;
+      proxy_connect_timeout 600;
+      proxy_send_timeout 600;
+
+      #Signals Front end
+      #location /${SIGNALS_BASE_URL} {
+      #  proxy_pass      https://${SERVER_NAME_PUBLIC}:443/;
+      #}
+
+      root /app;  # Ensure this points to your app's root
+      location / {
+          try_files $uri /index.html;
+      }
+
+      # Avoid cycles by serving index.html directly
+      location = /index.html {
+          allow all;
+      }
+
+      #Root context
+      #location / {
+        #index  index.html;
+        #try_files $uri $uri/ /index.html;
+        #try_files $uri /index.html;
+      #}
+
+    #Route api calls to the Backend, is activated only outside tws, ie when haproxy is not intervening
+    #If the url starts with the word api
+    location /api {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+      #proxy_pass http://quarkus-backend:8080/${APPLICATIONCONTEXT}/api;
+      #proxy_pass http://host.docker.internal:8080/api;
+      #proxy_pass http://quarkus-backend:8080/api;
+    }
+
+    #For Superset demo
+    location /undefined/api {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+      proxy_pass http://quarkus-backend:8080/${APPLICATIONCONTEXT}/api;
+      #proxy_pass http://host.docker.internal:8080/api;
+      #proxy_pass http://quarkus-backend:8080/api;
+    }
+
+    #To make sure refresh works, else we get 404
+    #location / {
+    # try_files $uri /index.html;
+    #}
+
+    #error_page   500 502 503 504  /50x.html;
+    #location = /50x.html {
+    #  root   /usr/share/nginx/html;
+    #}
+
+
+  }
+
+  #Main flow of the 1443 port (As non-root we cant use 443)
+  #server {
+  #  listen    ${SIGNALS_PORT} default_server ssl;
+  #  server_name  ${SERVER_NAME_PUBLIC};
+  # ssl_certificate /etc/nginx/certs/private.crt;
+  #  ssl_certificate_key /etc/nginx/certs/private.key;
+  #  #Disable any limits to avoid HTTP 413 for large image uploads
+  #  client_max_body_size 20M;
+  #  root   /app;
+
+    #Root context
+  #  location /${SIGNALS_BASE_URL} {
+  #    index  index.html;
+  #    try_files $uri $uri/ /index.html;
+  #  }
+
+
+    #Resources (js, css, images, fonts)
+    #location /${SIGNALS_BASE_URL}/js {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+    #  proxy_pass https://localhost:${SIGNALS_PORT}/js;
+    #}
+
+    #location /${SIGNALS_BASE_URL}/fonts {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+    #  proxy_pass https://localhost:${SIGNALS_PORT}/fonts;
+    #}
+
+
+    #location /${SIGNALS_BASE_URL}/css {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+    #  proxy_pass https://localhost:${SIGNALS_PORT}/css;
+    #}
+
+
+    #location /${SIGNALS_BASE_URL}/img {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+    #  proxy_pass https://localhost:${SIGNALS_PORT}/img;
+    #}
+    #location /${SIGNALS_BASE_URL}/favicon.ico {
+    #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
+    #  proxy_pass https://localhost:${SIGNALS_PORT}/favicon.ico;
+    #}
+
+
+
+  #}
+
+
+

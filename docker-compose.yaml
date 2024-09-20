@@ -170,6 +170,28 @@ services:
       options:
         max-size: "500m"
 
+  #Signals Frontend
+  vue-frontend:
+    build:
+      context: .
+      dockerfile: ./src/main/vue-app/Dockerfile.frontend
+    container_name: "vue-frontend"
+    env_file: .env
+    depends_on:
+      - quarkus-backend
+    ports:
+      - '80:8081'
+      #- '443:1443'
+    #    #We need to have the server certificates for https to our own containerized ngninx
+    #profiles:
+    #  - prod
+    #  - stage
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+
 volumes:
   minio-data:
     driver: local

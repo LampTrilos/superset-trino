@@ -5,3 +5,4 @@
 ./ais_mapped.csv
 ais_mapped.csv
 /target/
+/src/main/resources/META-INF/resources/

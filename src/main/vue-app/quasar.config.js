@@ -52,6 +52,7 @@ module.exports = configure(function (ctx) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
+      env: require('dotenv').config().parsed,
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
         node: 'node16',
@@ -68,9 +69,9 @@ module.exports = configure(function (ctx) {
         ? process.env.DEV_PUBLIC_PATH
         : process.env.PROD_PUBLIC_PATH,
       // analyze: true,
-      env: {
-        QENV: environmentConfiguration(process.env.QENV),
-      },
+      // env: {
+      //   QENV: environmentConfiguration(process.env.QENV),
+      // },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,

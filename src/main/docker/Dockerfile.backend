@@ -46,6 +46,14 @@ ARG APPLICATIONCONTEXT=" "
 
 #WORKDIR /usr/src/pol-signals/
 
+#TASOS
+#ARG WSIPRX
+#WORKDIR /usr/src/pol-signals/certs
+#RUN openssl s_client -showcerts -connect $WSIPRX </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > wsiprx.pem
+#WORKDIR /usr/src/pol-signals/
+#--TASOS
+
+
 RUN mvn package -DskipTests
 
 
@@ -58,6 +66,13 @@ RUN adduser --no-create-home -u 1000 -D $APPLICATION_USER
 
 # Configure working directory
 RUN mkdir /artifacts && chmod -R 777 /artifacts && chown -R $APPLICATION_USER /artifacts
+
+#TASOS
+#Now we will make JVM trust the self signed certificates
+#COPY --from=MAVEN_BUILD_IMAGE  /usr/src/pol-signals/certs /artifacts/quarkus/certs
+#Import of wsiprx cert leads to: keytool error: java.lang.Exception: Input not an X.509 certificate
+#RUN $JAVA_HOME/bin/keytool -import -file /artifacts/quarkus/certs/wsiprx.pem -alias wsiprx -keystore usr/lib/jvm/java-19-amazon-corretto/lib/security/cacerts -trustcacerts -storepass changeit -noprompt
+#--TASOS
 
 
 USER 1000
