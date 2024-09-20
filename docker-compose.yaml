@@ -173,14 +173,14 @@ services:
   #Signals Frontend
   vue-frontend:
     build:
-      context: .
-      dockerfile: ./src/main/vue-app/Dockerfile.frontend
+      context: ./src/main/vue-app
+      dockerfile: ./Dockerfile.frontend
     container_name: "vue-frontend"
     env_file: .env
     depends_on:
       - quarkus-backend
     ports:
-      - '80:8081'
+      - '8081:1080'
       #- '443:1443'
     #    #We need to have the server certificates for https to our own containerized ngninx
     #profiles:

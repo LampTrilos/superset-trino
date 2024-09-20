@@ -44,9 +44,9 @@
     #For Superset demo
     location /undefined/api {
     #If the URI is specified along with the address, it replaces the part of the request URI that matches the location parameter
-      proxy_pass http://quarkus-backend:8080/${APPLICATIONCONTEXT}/api;
+      #proxy_pass http://quarkus-backend:8080/${APPLICATIONCONTEXT}/api;
       #proxy_pass http://host.docker.internal:8080/api;
-      #proxy_pass http://quarkus-backend:8080/api;
+      proxy_pass http://quarkus-backend:8080/api;
     }
 
     #To make sure refresh works, else we get 404
