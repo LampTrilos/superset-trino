@@ -78,11 +78,8 @@ public class TransformLoadDataResource {
         System.out.println(filteredRoles.toString());
 
 
-
-
-
-            if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
-                // Decode the Base64 string to byte array
+        if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
+            // Decode the Base64 string to byte array
             byte[] decodedBytes = Base64.getDecoder().decode(sentFileAsBase64);
 
             // Create a temporary name for the temp file
@@ -113,26 +110,30 @@ public class TransformLoadDataResource {
 
             if (csvHeaders != null && csvHeaders.length > 0) {
 
-                boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(tenantId);
+//                boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(tenantId);
                 boolean successfulTempTableCreation = false;
                 boolean successfulOrcTableCreation = false;
                 boolean successfulInsertion = false;
 
 //            if the schema is there, we are creating the temp hive table based on the csv
-                if (successfulSchemaCreation) {
+//                if (successfulSchemaCreation) {
 //                   we drop the temp table
                     transformLoadDataService.dropTempHiveTable(tenantId);
                     successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders);
-                }
+//                }
+
+                // Regular expression for any non-alphanumeric character. We split the fileId to only alphabetical letters
+                String[] parts = fileId.split("[^a-zA-Z0-9]");
+                String fileNameForTable = parts[0];
 
 //            if the temp table is there, we are creating the orc table based on it
                 if (successfulTempTableCreation) {
-                    successfulOrcTableCreation = transformLoadDataService.createOrcHiveTable(tenantId, csvHeaders, headerType);
+                    successfulOrcTableCreation = transformLoadDataService.createOrcHiveTable(tenantId,fileNameForTable, csvHeaders, headerType);
                 }
 
 //            if the orc table is created correctly, then we are inserting the data
                 if (successfulOrcTableCreation) {
-                    successfulInsertion = transformLoadDataService.insertIntoOrcTable(tenantId, csvHeaders, headerType);
+                    successfulInsertion = transformLoadDataService.insertIntoOrcTable(tenantId,fileNameForTable, csvHeaders, headerType);
                 }
 //            we return the state of the transaction based on the success or not of the insertion
                 if (successfulInsertion) {

@@ -42,7 +42,7 @@ import java.util.List;
 public class TransformLoadDataService {
 
 
-    private static final String RAW_BUCKET = "raw-data";
+    private static final String RAW_BUCKET = "raw-data-";
 
 
     private final StorageService storageService;
@@ -64,7 +64,7 @@ public class TransformLoadDataService {
 
     //    we load the File into the  raw-data minio bucket based on the tenant id
     public void loadFileTOBucket(MinioClient minioClient, String tempName, String tenantId) throws Exception {
-        putObjectOnBucket(minioClient, tenantId, RAW_BUCKET,
+        putObjectOnBucket(minioClient, tenantId, RAW_BUCKET+tenantId,
                 tempName);
     }
 
@@ -107,7 +107,7 @@ public class TransformLoadDataService {
 
     public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_" + tenantId + ".temp_" + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive." + tenantId + ".temp_" + tenantId + "\n" +
                 "(\n");
         for (int i = 0; i < csvHeaders.length - 1; i++) {
             sql.append(csvHeaders[i]).append(" VARCHAR,\n");
@@ -116,7 +116,7 @@ public class TransformLoadDataService {
                 ")\n" +
                 "WITH ( format = 'CSV',\n" +
                 "    csv_separator = ',',\n" +
-                "    external_location = 's3a://raw-data/" + tenantId + "',\n" +
+                "    external_location = 's3a://raw-data-"+tenantId+"/" + tenantId + "',\n" +
                 "    skip_header_line_count = 1)");
 
         String result = trinoProcessing(sql.toString(), tenantId);
@@ -128,9 +128,9 @@ public class TransformLoadDataService {
 
     }
 
-    public boolean createOrcHiveTable(String tenantId, String[] csvHeaders, String[] headerType) {
+    public boolean createOrcHiveTable(String tenantId,String fileNameAsTable, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive.hive_schema_" + tenantId + "." + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive." + tenantId + "." + fileNameAsTable + "\n" +
                 "(\n");
 //        we iterate until length - 2 because we don't need the comma (,) at the length - 1
         for (int i = 0; i < csvHeaders.length - 1; i++) {
@@ -151,9 +151,9 @@ public class TransformLoadDataService {
     }
 
 
-    public boolean insertIntoOrcTable(String tenantId, String[] csvHeaders, String[] headerType) {
+    public boolean insertIntoOrcTable(String tenantId,String fileNameAsTable, String[] csvHeaders, String[] headerType) {
 
-        StringBuilder sql = new StringBuilder("INSERT INTO  hive.hive_schema_" + tenantId + "." + tenantId + "\n" +
+        StringBuilder sql = new StringBuilder("INSERT INTO  hive." + tenantId + "." + fileNameAsTable + "\n" +
                 " SELECT ");
         for (int i = 0; i < csvHeaders.length - 1; i++) {
 //            if the headerType is VARCHAR, then there is no need to try_cast
@@ -169,7 +169,7 @@ public class TransformLoadDataService {
         } else {
             sql.append("try_cast(" + csvHeaders[csvHeaders.length - 1]).append(" as " + headerType[headerType.length - 1] + ")\n");
         }
-        sql.append(" FROM hive.hive_schema_" + tenantId + ".temp_" + tenantId);
+        sql.append(" FROM hive." + tenantId + ".temp_" + tenantId);
 
 
         String result = trinoProcessing(sql.toString(), tenantId);
@@ -363,7 +363,7 @@ public class TransformLoadDataService {
     }
 
     public boolean createHiveSchema(String tenantId) {
-        String sql = "CREATE SCHEMA IF NOT EXISTS hive.hive_schema_" + tenantId + " WITH (location = 's3a://hive-warehouse-"+tenantId+"/')";
+        String sql = "CREATE SCHEMA IF NOT EXISTS hive."+ tenantId + " WITH (location = 's3a://hive-warehouse-"+tenantId+"/')";
         //String sql = "CREATE SCHEMA IF NOT EXISTS hive." + tenantId + " WITH (location = 's3a://"+tenantId+"/')";
         String result = trinoProcessing(sql, tenantId);
         if (result.contains("state\":\"FINISHED")) {
@@ -374,8 +374,7 @@ public class TransformLoadDataService {
     }
 
     public void dropTempHiveTable(String tenantId) {
-        String sql = "DROP TABLE hive.hive_schema_" + tenantId + ".temp_" + tenantId;
-        //String sql = "DROP TABLE hive." + tenantId + ".temp_" + tenantId;
+        String sql = "DROP TABLE hive." + tenantId + ".temp_" + tenantId;
         String result = trinoProcessing(sql, tenantId);
     }
 }
