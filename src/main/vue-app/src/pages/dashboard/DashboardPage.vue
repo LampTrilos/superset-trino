@@ -14,9 +14,9 @@
         <q-file
           name="Upload your csv"
           v-model="file"
-          accept=".csv"
+          accept=".csv, .json"
           filled
-          label="Pick your csv file to upload"
+          label="Pick your csv or json file to upload"
         />
         <div>
           <q-btn label="Submit" type="submit"  color="primary"/>
