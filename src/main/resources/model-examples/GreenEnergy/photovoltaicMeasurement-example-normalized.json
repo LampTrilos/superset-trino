@@ -1,0 +1,62 @@
+{
+  "id": "PhotovoltaicMeasurement:ENERGY-IMREDD-PV-0001",
+  "type": "PhotovoltaicMeasurement",
+  "dataProvider": {
+    "type": "Text",
+    "value": "https://imredd.fr/en/home/"
+  },
+  "name": {
+    "type": "Text",
+    "value": "Photovoltaic station IMREDD"
+  },
+  "description": {
+    "type": "Text",
+    "value": "Photovoltaic data provided by the data logger ABB"
+  },
+  "seeAlso": {
+    "type": "Text",
+    "value": "https://us.sunpower.com/products/solar-panels"
+  },
+  "location": {
+    "type": "geo:json",
+    "value": {
+      "type": "Point",
+      "coordinates": [
+        43.66481,
+        7.196545
+      ]
+    }
+  },
+  "address": {
+    "type": "StructuredValue",
+    "value": {
+      "addressCountry": "FR",
+      "addressLocality": "Nice",
+      "streetAddress": "61-63 Avenue Simone Veil"
+    }
+  },
+  "areaServed": {
+    "type": "Text",
+    "value": "Nice"
+  },
+  "refPhotovoltaicDevice": {
+    "type": "Text",
+    "value": "urn:ngsi-ld:PhotovoltaicDevice:PV-T2-R-012"
+  },
+  "dateObserved": {
+    "type": "DateTime",
+    "value": "2019-09-05T16:00:00.999Z"
+  },
+  "dateEnergyMeteringStarted": {
+    "type": "DateTime",
+    "value": "2019-09-04T15:29:17.999Z"
+  },
+  "nominalPeakPowerGeneration": {
+    "type": "Number",
+    "value": 179
+  },
+  "temperature": {
+    "type": "Number",
+    "value": 23.4
+  }
+}
