@@ -116,12 +116,12 @@ public class GeneralUtils {
   }
 
   public static JsonNode convertByteToJsonString(byte[] decodedBytes) {
-    // Convert the byte array to JSON
     ObjectMapper objectMapper = new ObjectMapper();
     try {
+      // Convert byte array to string
+      String jsonString = new String(decodedBytes);
       // Convert byte array to JsonNode
-
-        return objectMapper.readTree(decodedBytes);
+      return objectMapper.readTree(jsonString); // Use the string to avoid encoding issues
 
     } catch (IOException e) {
       System.out.println("Error converting byte array to JSON: " + e.getMessage());
@@ -129,57 +129,93 @@ public class GeneralUtils {
     return null;
   }
 
-  public static String convertJsonToCsv(JsonNode decodedAsJsonNode) {
+  // Converts JsonNode to CSV while retaining header order
+  public static String convertJsonToCsv(JsonNode decodedAsJsonNode) throws IOException {
     StringWriter csvWriter = new StringWriter();
 
-    // CSVPrinter setup
-    try (CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader(getHeaders(decodedAsJsonNode)))) {
+    // Get ordered headers (preserving order). Hadn't worked when used Set
+    List<String> headers = getHeaders(decodedAsJsonNode);
+
+    // CSVPrinter setup with ordered headers
+    try (CSVPrinter csvPrinter = new CSVPrinter(csvWriter, CSVFormat.DEFAULT.withHeader(headers.toArray(new String[0])))) {
 
       // If the JSON is an array of objects
-      if (decodedAsJsonNode.has("obj") && decodedAsJsonNode.get("obj").isArray()) {
-        // Get the array from the "obj" field
-        JsonNode objArray = decodedAsJsonNode.get("obj");
-        // Process each object in the array
-        for (JsonNode node : objArray) {
-          csvPrinter.printRecord(getValues(node));
-        }
-      } else if (decodedAsJsonNode.isArray()) {
-        // If the root itself is an array (unlikely in your case but handled for generality)
+      if (decodedAsJsonNode.isArray()) {
         for (JsonNode node : decodedAsJsonNode) {
-          csvPrinter.printRecord(getValues(node));
+          Map<String, String> flattenedRecord = flattenJson(node, "");
+          csvPrinter.printRecord(getValues(flattenedRecord, headers));
         }
       } else {
         // If it's a single object
-        csvPrinter.printRecord(getValues(decodedAsJsonNode));
+        Map<String, String> flattenedRecord = flattenJson(decodedAsJsonNode, "");
+        csvPrinter.printRecord(getValues(flattenedRecord, headers));
       }
-    } catch (IOException e) {
-        throw new RuntimeException(e);
     }
+    return csvWriter.toString(); // Return CSV string
+  }
 
-      return csvWriter.toString(); // Return CSV string
+  // Flattens the JSON into a Map<String, String> while preserving the order using LinkedHashMap
+  private static Map<String, String> flattenJson(JsonNode node, String prefix) {
+    Map<String, String> flattenedMap = new LinkedHashMap<>(); // Ordered map
+
+    node.fields().forEachRemaining(entry -> {
+      String fieldName = entry.getKey();
+      JsonNode childNode = entry.getValue();
+
+      String key = (prefix.isEmpty()) ? fieldName : prefix + "__" + fieldName; // Handle nested keys
+
+      if (childNode.isObject()) {
+        flattenedMap.putAll(flattenJson(childNode, key));
+      } else if (childNode.isArray()) {
+        // Handle arrays by flattening them
+        for (int i = 0; i < childNode.size(); i++) {
+          flattenedMap.putAll(flattenJson(childNode.get(i), key + "__" + i));
+        }
+      } else {
+        flattenedMap.put(key, childNode.asText());
+      }
+    });
+
+    return flattenedMap;
+  }
+
+  // Extracts the headers in order as a List<String>
+  private static List<String> getHeaders(JsonNode jsonNode) {
+    Set<String> headers = new LinkedHashSet<>(); // Ordered set for headers
+    flattenJson(jsonNode, "").forEach((key, value) -> headers.add(key));
+    return new ArrayList<>(headers); // Convert to List
+  }
+
+  // Retrieves values in the order of headers
+  private static List<String> getValues(Map<String, String> flattenedMap, List<String> headers) {
+    List<String> values = new ArrayList<>();
+    for (String header : headers) {
+      values.add(flattenedMap.getOrDefault(header, "")); // Get value by header or empty string if missing
+    }
+    return values;
   }
   // Extract headers from the JSON (keys)
-  private static String[] getHeaders(JsonNode jsonNode) {
-    Set<String> headers = new LinkedHashSet<>();
-
-    // Check if the root JSON node contains the "obj" array
-    if (jsonNode.has("obj") && jsonNode.get("obj").isArray()) {
-      // Get the first object from the array to extract the headers
-      JsonNode firstElement = jsonNode.get("obj").get(0);
-      addKeysToSet(firstElement, headers);
-    } else if (jsonNode.isArray()) {
-      // Handle the case where the root itself is an array
-      for (JsonNode node : jsonNode) {
-        addKeysToSet(node, headers);
-        break; // Only get headers from the first object
-      }
-    } else {
-      // If it's a single JSON object
-      addKeysToSet(jsonNode, headers);
-    }
-
-    return headers.toArray(new String[0]); // Convert to array
-  }
+//  private static String[] getHeaders(JsonNode jsonNode) {
+//    Set<String> headers = new LinkedHashSet<>();
+//
+//    // Check if the root JSON node contains the "obj" array
+//    if (jsonNode.has("obj") && jsonNode.get("obj").isArray()) {
+//      // Get the first object from the array to extract the headers
+//      JsonNode firstElement = jsonNode.get("obj").get(0);
+//      addKeysToSet(firstElement, headers);
+//    } else if (jsonNode.isArray()) {
+//      // Handle the case where the root itself is an array
+//      for (JsonNode node : jsonNode) {
+//        addKeysToSet(node, headers);
+//        break; // Only get headers from the first object
+//      }
+//    } else {
+//      // If it's a single JSON object
+//      addKeysToSet(jsonNode, headers);
+//    }
+//
+//    return headers.toArray(new String[0]); // Convert to array
+//  }
 
   // Extract values from the JSON object for a CSV row
   private static Object[] getValues(JsonNode jsonNode) {

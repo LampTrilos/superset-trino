@@ -1,6 +1,7 @@
 package gr.police.polseal.resource;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gr.police.polseal.service.TransformLoadDataService;
 import gr.police.polseal.service.utils.GeneralUtils;
 import io.minio.MinioClient;
@@ -19,9 +20,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Base64;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -46,6 +49,7 @@ public class TransformLoadDataResource {
     public Response loadFile(String sentFileAsBase64, @QueryParam("fileId") String fileId) throws Exception {
         // Remove leading and trailing quotes
         sentFileAsBase64 = sentFileAsBase64.replaceAll("^\"+|\"+$", "");
+        String[] csvHeaders = new String[0];
 
 //        we get the tenantId from the roles attribute of the sent JWT token
 //        String tenantId = jwt.getClaim("roles").toString().replace("\"", "")
@@ -74,10 +78,6 @@ public class TransformLoadDataResource {
         }
         tenantId = filteredRoles.toString();
 
-        // Output the final filtered result
-        System.out.println(filteredRoles.toString());
-
-
         if (tenantId != null && !tenantId.equalsIgnoreCase("")) {
             // Decode the Base64 string to byte array
             byte[] decodedBytes = Base64.getDecoder().decode(sentFileAsBase64);
@@ -86,13 +86,42 @@ public class TransformLoadDataResource {
             String tempName = tenantId + "_" + fileId;
 
             if (fileId.contains(".json")) {
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // Load photovoltaicMeasurement-example-normalized.json and parse the header
+                JsonNode photovoltaicMeasurementJson = objectMapper.readTree(new FileReader("src/main/resources/model-examples/GreenEnergy/photovoltaicMeasurement-example-normalized.json"));
+
                 JsonNode decodedAsJsonNode = GeneralUtils.convertByteToJsonString(decodedBytes);
+
+                // Extract headers from both JSON files
+                List<String> sentHeaders = transformLoadDataService.extractHeaders(decodedAsJsonNode, "");
+                List<String> exampleHeaders = transformLoadDataService.extractHeaders(photovoltaicMeasurementJson, "");
+
+                // Compare headers
+//                todo maybe check all the example json files in order to determine the type of the uplaoded json (photovoltaic, smart home etc)
+                if (sentHeaders.equals(exampleHeaders)) {
+                    // Headers match
+                    System.out.println("Headers Match");
+                } else {
+                    // Headers do NOT match
+                    System.out.println("Headers do NOT Match");
+                }
+
+                csvHeaders = exampleHeaders.toArray(new String[0]);
+
+//                we transform json to csv
                 String finalCsv = GeneralUtils.convertJsonToCsv(decodedAsJsonNode);
                 decodedBytes = finalCsv.getBytes(StandardCharsets.UTF_8);
 
 //                we change the file name to .csv as we'll manipulate it as such from now on
                 tempName = tempName.replace(".json", ".csv");
+            } else {
+//        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
+//        in order to use them to our create and insert trino queries
+                csvHeaders = GeneralUtils.extractingCSVHeaders(tempName);
             }
+
+//            we save the file as a temp in memory file
             File tempFile = new File(tempName);
             FileUtils.writeByteArrayToFile(tempFile, decodedBytes);
 
@@ -100,27 +129,22 @@ public class TransformLoadDataResource {
             MinioClient minioClient = transformLoadDataService.createMinioClient();
             transformLoadDataService.loadFileTOBucket(minioClient, tempName, tenantId);
 
-//        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
-//        in order to use them to our create and insert trino queries
-            String[] csvHeaders = GeneralUtils.extractingCSVHeaders(tempName);
+//            we check for the header type of each column. This will be used when the insert query is built
             String[] headerType = transformLoadDataService.determineColumnType(tempName);
 
 //           we delete the in memory created file
             Files.deleteIfExists(java.nio.file.Path.of(tempName));
 
-            if (csvHeaders != null && csvHeaders.length > 0) {
 
-//                boolean successfulSchemaCreation = transformLoadDataService.createHiveSchema(tenantId);
+            if (csvHeaders != null && csvHeaders.length > 0) {
                 boolean successfulTempTableCreation = false;
                 boolean successfulOrcTableCreation = false;
                 boolean successfulInsertion = false;
 
-//            if the schema is there, we are creating the temp hive table based on the csv
-//                if (successfulSchemaCreation) {
 //                   we drop the temp table
-                    transformLoadDataService.dropTempHiveTable(tenantId);
-                    successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders);
-//                }
+                transformLoadDataService.dropTempHiveTable(tenantId);
+//            we are creating the temp hive table based on the csv
+                successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders);
 
                 // Regular expression for any non-alphanumeric character. We split the fileId to only alphabetical letters
                 String[] parts = fileId.split("[^a-zA-Z0-9]");
@@ -128,12 +152,12 @@ public class TransformLoadDataResource {
 
 //            if the temp table is there, we are creating the orc table based on it
                 if (successfulTempTableCreation) {
-                    successfulOrcTableCreation = transformLoadDataService.createOrcHiveTable(tenantId,fileNameForTable, csvHeaders, headerType);
+                    successfulOrcTableCreation = transformLoadDataService.createOrcHiveTable(tenantId, fileNameForTable, csvHeaders, headerType);
                 }
 
 //            if the orc table is created correctly, then we are inserting the data
                 if (successfulOrcTableCreation) {
-                    successfulInsertion = transformLoadDataService.insertIntoOrcTable(tenantId,fileNameForTable, csvHeaders, headerType);
+                    successfulInsertion = transformLoadDataService.insertIntoOrcTable(tenantId, fileNameForTable, csvHeaders, headerType);
                 }
 //            we return the state of the transaction based on the success or not of the insertion
                 if (successfulInsertion) {

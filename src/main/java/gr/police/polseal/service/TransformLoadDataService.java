@@ -1,5 +1,6 @@
 package gr.police.polseal.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -33,7 +34,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @ApplicationScoped
@@ -64,7 +67,7 @@ public class TransformLoadDataService {
 
     //    we load the File into the  raw-data minio bucket based on the tenant id
     public void loadFileTOBucket(MinioClient minioClient, String tempName, String tenantId) throws Exception {
-        putObjectOnBucket(minioClient, tenantId, RAW_BUCKET+tenantId,
+        putObjectOnBucket(minioClient, tenantId, RAW_BUCKET + tenantId,
                 tempName);
     }
 
@@ -76,10 +79,11 @@ public class TransformLoadDataService {
                 .build();
 
     }
-//    we create raw-data and hive-warehouse buckets
-    public void createBuckets (MinioClient minioClient, String tenantId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String rawDataBucket = "raw-data-"+tenantId;
-        String hiveWarehouseBucket = "hive-warehouse-"+tenantId;
+
+    //    we create raw-data and hive-warehouse buckets
+    public void createBuckets(MinioClient minioClient, String tenantId) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String rawDataBucket = "raw-data-" + tenantId;
+        String hiveWarehouseBucket = "hive-warehouse-" + tenantId;
         boolean foundRawData = minioClient.bucketExists(BucketExistsArgs.builder().bucket(rawDataBucket).build());
         if (!foundRawData) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(rawDataBucket).build());
@@ -89,9 +93,9 @@ public class TransformLoadDataService {
         boolean foundHiveWareHouse = minioClient.bucketExists(BucketExistsArgs.builder().bucket(hiveWarehouseBucket).build());
         if (!foundHiveWareHouse) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(hiveWarehouseBucket).build());
-            System.out.println("Bucket "+ hiveWarehouseBucket +" created ");
+            System.out.println("Bucket " + hiveWarehouseBucket + " created ");
         } else {
-            System.out.println("Bucket "+hiveWarehouseBucket+" already exists.");
+            System.out.println("Bucket " + hiveWarehouseBucket + " already exists.");
         }
     }
 
@@ -116,10 +120,11 @@ public class TransformLoadDataService {
                 ")\n" +
                 "WITH ( format = 'CSV',\n" +
                 "    csv_separator = ',',\n" +
-                "    external_location = 's3a://raw-data-"+tenantId+"/" + tenantId + "',\n" +
-                "    skip_header_line_count = 1)");
+                "    external_location = 's3a://raw-data-" + tenantId + "/" + tenantId + "',\n" +
+                "    skip_header_line_count = 1)"
+        );
 
-        String result = trinoProcessing(sql.toString(), tenantId);
+        String result = trinoProcessing(sql.toString().replace("__", "_"), tenantId);
         if (result.contains("state\":\"FINISHED")) {
             return true;
         } else {
@@ -128,7 +133,7 @@ public class TransformLoadDataService {
 
     }
 
-    public boolean createOrcHiveTable(String tenantId,String fileNameAsTable, String[] csvHeaders, String[] headerType) {
+    public boolean createOrcHiveTable(String tenantId, String fileNameAsTable, String[] csvHeaders, String[] headerType) {
 
         StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive." + tenantId + "." + fileNameAsTable + "\n" +
                 "(\n");
@@ -151,7 +156,7 @@ public class TransformLoadDataService {
     }
 
 
-    public boolean insertIntoOrcTable(String tenantId,String fileNameAsTable, String[] csvHeaders, String[] headerType) {
+    public boolean insertIntoOrcTable(String tenantId, String fileNameAsTable, String[] csvHeaders, String[] headerType) {
 
         StringBuilder sql = new StringBuilder("INSERT INTO  hive." + tenantId + "." + fileNameAsTable + "\n" +
                 " SELECT ");
@@ -287,7 +292,9 @@ public class TransformLoadDataService {
                 DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z"),  // Tue, 12 Sep 2023 14:30:45 GMT
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),  // 2023-09-12T14:30:45.123Z (UTC)
 
-                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")  // 2010-08-24 18:31:35.0
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"),  // 2010-08-24 18:31:35.0
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSX"),  // 2010-08-24 18:31:35.0
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSX")  // 2010-08-24 18:31:35.0
         );
 
         for (DateTimeFormatter format : DATE_FORMATS) {
@@ -363,7 +370,7 @@ public class TransformLoadDataService {
     }
 
     public boolean createHiveSchema(String tenantId) {
-        String sql = "CREATE SCHEMA IF NOT EXISTS hive."+ tenantId + " WITH (location = 's3a://hive-warehouse-"+tenantId+"/')";
+        String sql = "CREATE SCHEMA IF NOT EXISTS hive." + tenantId + " WITH (location = 's3a://hive-warehouse-" + tenantId + "/')";
         //String sql = "CREATE SCHEMA IF NOT EXISTS hive." + tenantId + " WITH (location = 's3a://"+tenantId+"/')";
         String result = trinoProcessing(sql, tenantId);
         if (result.contains("state\":\"FINISHED")) {
@@ -376,6 +383,32 @@ public class TransformLoadDataService {
     public void dropTempHiveTable(String tenantId) {
         String sql = "DROP TABLE hive." + tenantId + ".temp_" + tenantId;
         String result = trinoProcessing(sql, tenantId);
+    }
+
+    // Helper method to extract all field names (headers)
+    public List<String> extractHeaders(JsonNode jsonNode, String parentKey) {
+        List<String> headers = new ArrayList<>();
+        Iterator<String> fieldNames = jsonNode.fieldNames();
+
+        while (fieldNames.hasNext()) {
+            String fieldName = fieldNames.next();
+            JsonNode childNode = jsonNode.get(fieldName);
+
+            // Check if the child is an object or array
+            if (childNode.isObject() || childNode.isArray()) {
+                // Recursively extract nested fields, appending parent key to keep track of hierarchy
+                headers.addAll(extractHeaders(childNode, parentKey + fieldName + "__"));
+            } else {
+                // Add field name with parent prefix if it exists
+                headers.add(parentKey + fieldName);
+            }
+        }
+//        Trino doesn't tolarate __ to column names, so we have to replace it to _
+        List<String> updatedHeaders = headers.stream()
+                .map(header -> header.replace("__", "_")) // Replace "__" with "_"
+                .collect(Collectors.toList()); // Collect the results into a new set
+
+        return updatedHeaders;
     }
 }
 
