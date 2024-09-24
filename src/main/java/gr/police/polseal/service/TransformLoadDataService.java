@@ -104,12 +104,12 @@ public class TransformLoadDataService {
 
         minioClient.uploadObject(UploadObjectArgs.builder()
                 .bucket(bucketname)
-                .object(tenantiId + "/" + objectname)
+                .object(tenantiId + "/" + objectname.replace(".csv","") +"/"+objectname)
                 .filename(objectname)
                 .build());
     }
 
-    public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
+    public boolean createTempHiveTable(String tenantId, String[] csvHeaders, String tempFileName) {
 
         StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive." + tenantId + ".temp_" + tenantId + "\n" +
                 "(\n");
@@ -120,7 +120,7 @@ public class TransformLoadDataService {
                 ")\n" +
                 "WITH ( format = 'CSV',\n" +
                 "    csv_separator = ',',\n" +
-                "    external_location = 's3a://raw-data-" + tenantId + "/" + tenantId + "',\n" +
+                "    external_location = 's3a://raw-data-" + tenantId + "/" + tenantId + "/"+tempFileName.replace(".csv","")+"',\n" +
                 "    skip_header_line_count = 1)"
         );
 
@@ -190,27 +190,26 @@ public class TransformLoadDataService {
     public String[] determineColumnType(String filename) {
         int rowsToCheck = 5;  // Number of rows to check for each column
 
-
         try (CSVReader reader = new CSVReader(new FileReader(filename))) {
             String[] headers = reader.readNext();  // Read headers
-            String[] headerType = new String[headers.length];
+            String[] headerType = new String[headers.length];  // Initialize array to store detected types
 
             List<String[]> rows = new ArrayList<>();
 
             // Read first few rows
             for (int i = 0; i < rowsToCheck; i++) {
                 String[] row = reader.readNext();
-                if (row == null) break;
-                rows.add(row);
+                if (row == null) break;  // Stop if there are no more rows
+                rows.add(row);  // Add the row to the list
             }
 
-            // Check each column for data types
+            // Iterate through each column and determine its type
             for (int col = 0; col < headers.length; col++) {
-                String detectedType = detectColumnType(rows, col);
-                assert headerType != null;
-                headerType[col] = detectedType;
+                String detectedType = detectColumnType(rows, col);  // Detect type for each column
+                headerType[col] = detectedType != null ? detectedType : "VARCHAR";  // Default to VARCHAR if type cannot be determined
             }
-            return headerType;
+
+            return headerType;  // Return array of header types
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,17 +217,29 @@ public class TransformLoadDataService {
         return null;
     }
 
+
     // Detect the type of a column based on sample values
     private static String detectColumnType(List<String[]> rows, int colIndex) {
         boolean isInteger = true;
+        boolean isDouble = true;
         boolean isTimestamp = true;
 
         for (String[] row : rows) {
             String value = row[colIndex];
 
+            // Skip empty or null values
+            if (value == null || value.trim().isEmpty()) {
+                continue;
+            }
+
             // Check for INTEGER
             if (isInteger && !isInteger(value)) {
                 isInteger = false;
+            }
+
+            // Check for DOUBLE
+            if (isDouble && !isDouble(value)) {
+                isDouble = false;
             }
 
             // Check for TIMESTAMP
@@ -236,17 +247,20 @@ public class TransformLoadDataService {
                 isTimestamp = false;
             }
 
-            // If neither, it's VARCHAR
-            if (!isInteger && !isTimestamp) {
+            // If it's none of the types, return VARCHAR
+            if (!isInteger && !isDouble && !isTimestamp) {
                 return "VARCHAR";
             }
         }
 
-        if (isInteger) return "INTEGER";
+        // Prioritize the most specific type: TIMESTAMP > DOUBLE > INTEGER
         if (isTimestamp) return "TIMESTAMP";
+        if (isDouble) return "DOUBLE";
+        if (isInteger) return "INTEGER";
 
         return "VARCHAR";  // Default to VARCHAR
     }
+
 
     // Check if a value is an integer
     private static boolean isInteger(String value) {
@@ -257,6 +271,17 @@ public class TransformLoadDataService {
             return false;
         }
     }
+
+    // Check if a value is a double
+    private static boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     // Check if a value matches any of the date formats
     private static boolean isDate(String value) {
@@ -385,30 +410,39 @@ public class TransformLoadDataService {
         String result = trinoProcessing(sql, tenantId);
     }
 
-    // Helper method to extract all field names (headers)
-    public List<String> extractHeaders(JsonNode jsonNode, String parentKey) {
+    // Method to extract headers from a nested JSON structure
+    public  List<String> extractHeaders(JsonNode jsonNode, String parentKey) {
         List<String> headers = new ArrayList<>();
         Iterator<String> fieldNames = jsonNode.fieldNames();
 
         while (fieldNames.hasNext()) {
             String fieldName = fieldNames.next();
             JsonNode childNode = jsonNode.get(fieldName);
+            String fullKey = parentKey.isEmpty() ? fieldName : parentKey + "__" + fieldName;
 
-            // Check if the child is an object or array
-            if (childNode.isObject() || childNode.isArray()) {
-                // Recursively extract nested fields, appending parent key to keep track of hierarchy
-                headers.addAll(extractHeaders(childNode, parentKey + fieldName + "__"));
+            if (childNode.isObject()) {
+                // Recursively process nested objects
+                headers.addAll(extractHeaders(childNode, fullKey));
+            } else if (childNode.isArray()) {
+                // For arrays, extract headers from the first element
+                if (childNode.size() > 0 && childNode.get(0).isObject()) {
+                    headers.addAll(extractHeaders(childNode.get(0), fullKey));
+                } else {
+                    headers.add(fullKey); // Array of primitive types
+                }
             } else {
-                // Add field name with parent prefix if it exists
-                headers.add(parentKey + fieldName);
+                headers.add(fullKey); // Add the header for primitive types
             }
         }
+
+
 //        Trino doesn't tolarate __ to column names, so we have to replace it to _
         List<String> updatedHeaders = headers.stream()
                 .map(header -> header.replace("__", "_")) // Replace "__" with "_"
                 .collect(Collectors.toList()); // Collect the results into a new set
 
         return updatedHeaders;
+
     }
 }
 
