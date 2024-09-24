@@ -99,7 +99,7 @@ public class TransformLoadDataResource {
                 List<String> exampleHeaders = transformLoadDataService.extractHeaders(pollutionJson, "");
 
                 // Compare headers
-//                todo maybe check all the example json files in order to determine the type of the uplaoded json (photovoltaic, smart home etc)
+//                todo maybe check all the example json files in order to determine the type of the uploaded json (photovoltaic, smart home etc)
                 if (sentHeaders.equals(exampleHeaders)) {
                     // Headers match
                     System.out.println("Headers Match");
@@ -145,7 +145,7 @@ public class TransformLoadDataResource {
 //                   we drop the temp table
                 transformLoadDataService.dropTempHiveTable(tenantId);
 //            we are creating the temp hive table based on the csv
-                successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders);
+                successfulTempTableCreation = transformLoadDataService.createTempHiveTable(tenantId, csvHeaders, tempName);
 
                 // Regular expression for any non-alphanumeric character. We split the fileId to only alphabetical letters
                 String[] parts = fileId.split("[^a-zA-Z0-9]");

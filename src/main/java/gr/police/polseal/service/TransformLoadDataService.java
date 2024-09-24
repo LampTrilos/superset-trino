@@ -104,12 +104,12 @@ public class TransformLoadDataService {
 
         minioClient.uploadObject(UploadObjectArgs.builder()
                 .bucket(bucketname)
-                .object(tenantiId + "/" + objectname)
+                .object(tenantiId + "/" + objectname.replace(".csv","") +"/"+objectname)
                 .filename(objectname)
                 .build());
     }
 
-    public boolean createTempHiveTable(String tenantId, String[] csvHeaders) {
+    public boolean createTempHiveTable(String tenantId, String[] csvHeaders, String tempFileName) {
 
         StringBuilder sql = new StringBuilder("CREATE TABLE if not exists hive." + tenantId + ".temp_" + tenantId + "\n" +
                 "(\n");
@@ -120,7 +120,7 @@ public class TransformLoadDataService {
                 ")\n" +
                 "WITH ( format = 'CSV',\n" +
                 "    csv_separator = ',',\n" +
-                "    external_location = 's3a://raw-data-" + tenantId + "/" + tenantId + "',\n" +
+                "    external_location = 's3a://raw-data-" + tenantId + "/" + tenantId + "/"+tempFileName.replace(".csv","")+"',\n" +
                 "    skip_header_line_count = 1)"
         );
 
