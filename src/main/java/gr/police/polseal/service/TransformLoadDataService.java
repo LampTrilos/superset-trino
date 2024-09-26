@@ -1,6 +1,7 @@
 package gr.police.polseal.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -25,6 +26,7 @@ import org.apache.http.util.EntityUtils;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -32,10 +34,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -46,6 +45,10 @@ public class TransformLoadDataService {
 
 
     private static final String RAW_BUCKET = "raw-data-";
+
+
+    //    the directory from which the example json will be pulled in order to check the headers
+    private static final String MODEL_EXAMPLE_DIRECTORY = "src/main/resources/model-examples/";
 
 
     private final StorageService storageService;
@@ -444,5 +447,35 @@ public class TransformLoadDataService {
         return updatedHeaders;
 
     }
+
+
+    public List<String> compareHeadersAndReturnExample(JsonNode sentJsonNode) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Load all example JSON files
+        File[] exampleFiles = new File(MODEL_EXAMPLE_DIRECTORY).listFiles((dir, name) -> name.endsWith(".json"));
+
+        if (exampleFiles == null || exampleFiles.length == 0) {
+            throw new IOException("No example JSON files found.");
+        }
+
+        List<String> sentHeaders = extractHeaders(sentJsonNode, "");
+
+        // Loop through all example files and compare headers
+        for (File exampleFile : exampleFiles) {
+            JsonNode exampleJson = objectMapper.readTree(new FileReader(exampleFile));
+            List<String> exampleHeaders = extractHeaders(exampleJson, "");
+
+            if (sentHeaders.equals(exampleHeaders)) {
+                System.out.println("Headers Match with: " + exampleFile.getName());
+                return exampleHeaders;  // Match found
+            }
+        }
+
+        System.out.println("Headers do NOT match any example file.");
+        return null;  // No match found
+    }
+
+
 }
 

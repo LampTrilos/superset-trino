@@ -20,11 +20,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
-import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -40,6 +38,9 @@ public class TransformLoadDataResource {
 
 
     private final TransformLoadDataService transformLoadDataService;
+
+//    the directory from which the example json will be pulled in order to check the headers
+    private static String MODEL_EXAMPLE_DIRECTORY = "src/main/resources/model-examples/";
 
     @Inject
     JsonWebToken jwt;
@@ -88,37 +89,29 @@ public class TransformLoadDataResource {
             if (fileId.contains(".json")) {
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                // Load photovoltaicMeasurement-example-normalized.json and parse the header
-//                JsonNode photovoltaicMeasurementJson = objectMapper.readTree(new FileReader("src/main/resources/model-examples/GreenEnergy/photovoltaicMeasurement-example-normalized.json"));
-                JsonNode pollutionJson = objectMapper.readTree(new FileReader("src/main/resources/model-examples/GreenEnergy/Environment/Polution_Athens_2020_Hourly.json"));
+                // Load all example JSON files in the directory and extract the headers from sent JSON
                 JsonNode decodedAsJsonNode = GeneralUtils.convertByteToJsonString(decodedBytes);
-
-                // Extract headers from both JSON files
                 List<String> sentHeaders = transformLoadDataService.extractHeaders(decodedAsJsonNode, "");
-//                List<String> exampleHeaders = transformLoadDataService.extractHeaders(photovoltaicMeasurementJson, "");
-                List<String> exampleHeaders = transformLoadDataService.extractHeaders(pollutionJson, "");
 
-                // Compare headers
-//                todo maybe check all the example json files in order to determine the type of the uploaded json (photovoltaic, smart home etc)
-                if (sentHeaders.equals(exampleHeaders)) {
-                    // Headers match
-                    System.out.println("Headers Match");
-                } else {
-                    // Headers do NOT match
-                    System.out.println("Headers do NOT Match");
+//                // Compare headers with all example JSON files
+                List<String> exampleHeaders = transformLoadDataService.compareHeadersAndReturnExample(decodedAsJsonNode);
+
+                if (exampleHeaders.isEmpty()) {
+                    // No match found
+                    return Response.status(Response.Status.BAD_REQUEST).entity("Headers do NOT Match any example file.").build();
                 }
 
+                // If a match is found, load the example headers for CSV generation
                 csvHeaders = exampleHeaders.toArray(new String[0]);
 
-//                we transform json to csv
+                // Transform the JSON to CSV
                 String finalCsv = GeneralUtils.convertJsonToCsv(decodedAsJsonNode);
                 decodedBytes = finalCsv.getBytes(StandardCharsets.UTF_8);
 
-//                we change the file name to .csv as we'll manipulate it as such from now on
+                // Change the file name to .csv
                 tempName = tempName.replace(".json", ".csv");
             } else {
-//        we calculate the csvHeaders and their type (VARCHAR, INTEGER or TIMESTAMP)
-//        in order to use them to our create and insert trino queries
+                // Handle non-JSON files (CSV files)
                 csvHeaders = GeneralUtils.extractingCSVHeaders(tempName);
             }
 
