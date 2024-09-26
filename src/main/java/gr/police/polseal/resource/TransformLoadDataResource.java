@@ -39,7 +39,7 @@ public class TransformLoadDataResource {
 
     private final TransformLoadDataService transformLoadDataService;
 
-//    the directory from which the example json will be pulled in order to check the headers
+    //    the directory from which the example json will be pulled in order to check the headers
     private static String MODEL_EXAMPLE_DIRECTORY = "src/main/resources/model-examples/";
 
     @Inject
@@ -87,11 +87,8 @@ public class TransformLoadDataResource {
             String tempName = tenantId + "_" + fileId;
 
             if (fileId.contains(".json")) {
-                ObjectMapper objectMapper = new ObjectMapper();
-
                 // Load all example JSON files in the directory and extract the headers from sent JSON
                 JsonNode decodedAsJsonNode = GeneralUtils.convertByteToJsonString(decodedBytes);
-                List<String> sentHeaders = transformLoadDataService.extractHeaders(decodedAsJsonNode, "");
 
 //                // Compare headers with all example JSON files
                 List<String> exampleHeaders = transformLoadDataService.compareHeadersAndReturnExample(decodedAsJsonNode);
