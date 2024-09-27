@@ -3016,7 +3016,7 @@
     ]
   },
   {
-    "name": "sales",
+    "name": "roleA",
     "permissions": [
       {
         "permission": {
@@ -3053,7 +3053,7 @@
     ]
   },
   {
-    "name": "logistics",
+    "name": "roleB",
     "permissions": [
       {
         "permission": {

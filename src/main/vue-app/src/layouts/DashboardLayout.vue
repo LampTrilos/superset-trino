@@ -8,7 +8,7 @@
       <div class="row  q-mb-md q-pb-sm q-pt-md bg-primary"  style="border-bottom: 3px solid white;">
         <q-space  class="bg-primary" />
         <!--        <q-icon size="32px" name="img:/icons/logo-white.svg" />-->
-        <h5 class="q-my-sm  bg-primary" style="margin-left: -1rem;">Έλεγχος αεροδρομίων</h5>
+        <h5 class="q-my-sm  bg-primary" style="margin-left: -1rem;">PLEIONE</h5>
         <q-space  class="bg-primary" />
       </div>
       <!--      <q-list>-->

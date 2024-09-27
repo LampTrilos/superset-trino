@@ -60,8 +60,8 @@ AUTH_ROLES_MAPPING = {
   "admin": ["Admin"],
   "superUser": ["Alpha"],
   "simpleUser": ["Gamma"],
-  "sales": ["sales"],
-  "logistics": ["logistics"]
+  "roleA": ["roleA"],
+  "roleB": ["roleB"]
 }
 
 
