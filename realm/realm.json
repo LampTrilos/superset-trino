@@ -64,7 +64,7 @@
       },
       {
         "id": "7801ba1e-18f3-4e85-978a-f3bd09dea9f7",
-        "name": "sales",
+        "name": "roleA",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -133,7 +133,7 @@
       },
       {
         "id": "35f59ab7-65f1-402a-9a1c-702ffaa4c055",
-        "name": "logistics",
+        "name": "roleB",
         "description": "",
         "composite": false,
         "clientRole": false,
@@ -402,7 +402,7 @@
         },
         {
           "id": "80efe5a6-e774-4203-94b4-feb6bc373c84",
-          "name": "sales",
+          "name": "roleA",
           "composite": false,
           "clientRole": true,
           "containerId": "302430aa-3929-42cf-8ba2-2b9d2e71dc3a",
@@ -410,7 +410,7 @@
         },
         {
           "id": "96be219a-acc6-43c6-b1a7-1e60cf342347",
-          "name": "logistics",
+          "name": "roleB",
           "composite": false,
           "clientRole": true,
           "containerId": "302430aa-3929-42cf-8ba2-2b9d2e71dc3a",

@@ -19,8 +19,8 @@ To add the roles inside the token go: Clients -> backend-service -> Client Detai
    "admin": ["Admin"],
    "superUser": ["Alpha"],
    "simpleUser": ["Gamma"],
-   "sales": ["sales"],
-   "logistics": ["logistics"],
+   "roleA": ["roleA"],
+   "roleB": ["roleB"],
 
 ####UIs are accessible at the following links:#####
 Trino: `http://localhost:5542/ui/` (username can be anything) <br>
